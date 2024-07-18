@@ -1,0 +1,568 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Dashboard {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+<style>
+  body {
+    background: #f7f7f7 !important;
+    color: #333;
+    /* Couleur du texte pour contraste */
+  }
+
+  .section-title {
+    margin-left: 15px;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+  }
+
+  .profile-card {
+    background-color: #fff;
+    border: none;
+    border-radius: 10px;
+    color: #333;
+    /* Couleur du texte pour contraste */
+  }
+
+  .user-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+  }
+
+  .user-table th {
+    text-align: left;
+    padding: 10px 15px;
+    background-color: #e9ecef;
+    border-top: none;
+    border-bottom: 2px solid #dee2e6;
+    color: #333;
+    /* Couleur pour le texte de l'en-tête */
+  }
+
+  .user-table td {
+    padding: 15px;
+    vertical-align: middle;
+    background-color: #fff;
+    border-top: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+    color: #333;
+    /* Couleur pour le texte des cellules */
+  }
+
+  .user-info .d-flex {
+    align-items: center;
+  }
+
+  .user-info img {
+    border: 2px solid #dee2e6;
+  }
+
+  .status-info .d-flex {
+    margin-left: -60px;
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .status-dot.online {
+    background-color: #28a745;
+  }
+
+  .status-dot.offline {
+    background-color: #dc3545;
+  }
+
+  .ml-3 {
+    margin-left: 1rem !important;
+  }
+
+  .ml-2 {
+    margin-left: 0.5rem !important;
+  }
+
+  .header.bg-primary {
+    background-color: #f7f7f7 !important;
+  }
+
+  .header .h2,
+  .header .breadcrumb,
+  .header .btn {
+    color: #333;
+    /* Couleur du texte et des icônes dans l'en-tête */
+  }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+<!-- Header -->
+<!-- Header -->
+<div class="header bg-primary pb-6">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item"><a href="#">Dashboards</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Default</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+      <!-- Card stats -->
+      <div class="row">
+        <div class="col-xl-3 col-md-6">
+          <div class="card card-stats">
+            <!-- Card body -->
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">Nombres de Conducteurs</h5>
+                  <span class="h2 font-weight-bold mb-0">{{ nombre_conducteur }}</span>
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                    <i class="ni ni-active-40"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+          <div class="card card-stats">
+            <!-- Card body -->
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">Nombres de Véhicules</h5>
+                  <span class="h2 font-weight-bold mb-0">{{ nombre_Voiture }}</span>
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                    <i class="ni ni-chart-pie-35"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+          <div class="card card-stats">
+            <!-- Card body -->
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">Nombre de Profile</h5>
+                  <span class="h2 font-weight-bold mb-0">{{ nombre_profile }}</span>
+                </div>
+                <div class="col-auto">
+                  <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                    <i class="ni ni-money-coins"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-8">
+            <h3 class="section-title"><i class="fas fa-wrench header-icon"></i>Réparations en cours</h3>
+            <!-- Ajoutez ici votre tableau ou section de réparations -->
+            <div class="container-fluid">
+              <div class="card profile-card">
+                <div class="card-body">
+                  <table class="user-table table">
+                    <thead>
+                      <tr>
+                        <th>Véhicule</th>
+                        <th>Type de réparation</th>
+                        <th>Date de début</th>
+                        <th>Statut</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for repair in repairs %}
+                      <tr>
+                        <td>{{ repair.vehicle }}</td>
+                        <td>{{ repair.repair_type }}</td>
+                        <td>{{ repair.start_date }}</td>
+                        <td>{{ repair.status }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <!-- Diagramme circulaire de répartition des types d'entretien -->
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Répartition des types d'entretien</h5>
+                <canvas id="maintenanceChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-8">
+            <h3 class="section-title"><i class="fas fa-car header-icon"></i> Voitures en Temps Réel</h3>
+            <!-- Tableau des informations sur les voitures -->
+            <div class="container-fluid">
+              <div class="card profile-card">
+                <div class="card-body">
+                  <table id="realTimeCarsTable" class="car-table table">
+                    <thead>
+                      <tr>
+                        <th>Marque</th>
+                        <th>Modèle</th>
+                        <th>Année</th>
+                        <th>Statut</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Les données seront ajoutées dynamiquement via JavaScript -->
+                      {% for marque_voiture in marque_voitures %}
+                      <tr>
+                        <td>{{ marque_voiture.marque }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <!-- Exemple de carte d'une voiture en détail -->
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Détails de la Voiture</h5>
+                <ul id="carDetailsList" class="list-group">
+                  <!-- Les détails de la voiture seront mis à jour via JavaScript -->
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- <script>
+  // Fonction pour générer des données aléatoires de voitures
+  function generateRandomCars() {
+    var cars = [
+      { marque: 'Toyota', modele: 'Camry', annee: 2020, statut: 'Disponible' },
+      { marque: 'Honda', modele: 'Civic', annee: 2019, statut: 'En Maintenance' },
+      { marque: 'Ford', modele: 'Focus', annee: 2018, statut: 'Disponible' },
+      { marque: 'Chevrolet', modele: 'Malibu', annee: 2021, statut: 'En Réparation' }
+    ];
+
+    return cars;
+  }
+
+  // Fonction pour mettre à jour le tableau des voitures en temps réel
+  function updateRealTimeCarsTable() {
+    var cars = generateRandomCars();
+    var tableBody = document.getElementById('realTimeCarsTable').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = '';
+
+    cars.forEach(function (car) {
+      var row = `<tr>
+                  <td>${car.marque}</td>
+                  <td>${car.modele}</td>
+                  <td>${car.annee}</td>
+                  <td>${car.statut}</td>
+                </tr>`;
+      tableBody.insertAdjacentHTML('beforeend', row);
+    });
+
+    // Sélectionner la première voiture pour afficher les détails
+    if (cars.length > 0) {
+      showCarDetails(cars[0]);
+    }
+  }
+
+  // Fonction pour afficher les détails d'une voiture sélectionnée
+  function showCarDetails(car) {
+    var carDetailsList = document.getElementById('carDetailsList');
+    carDetailsList.innerHTML = '';
+
+    var details = [
+      `Marque: ${car.marque}`,
+      `Modèle: ${car.modele}`,
+      `Année: ${car.annee}`,
+      `Statut: ${car.statut}`
+    ];
+
+    details.forEach(function (detail) {
+      var listItem = `<li class="list-group-item">${detail}</li>`;
+      carDetailsList.insertAdjacentHTML('beforeend', listItem);
+    });
+  }
+
+  // Initialisation du tableau des voitures en temps réel
+  updateRealTimeCarsTable();
+  // Mettre à jour toutes les 5 secondes (à titre d'exemple)
+  setInterval(updateRealTimeCarsTable, 5000);
+</script> -->
+
+
+<script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
+<script>
+  // Données fictives pour l'exemple
+  var vehicleData = {
+    labels: ['Voitures', 'Camions', 'Fourgonnettes'],
+    datasets: [{
+      label: 'Nombre de véhicules',
+      backgroundColor: ['#3498db', '#2ecc71', '#f39c12'],
+      data: [25, 10, 15]  // Remplacez par vos données dynamiques
+    }]
+  };
+
+  // Configuration du graphique
+  var ctx = document.getElementById('vehicleChart').getContext('2d');
+  var vehicleChart = new Chart(ctx, {
+    type: 'bar',
+    data: vehicleData,
+    options: {
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      }
+    }
+  });
+</script>
+
+<script>
+  // Données fictives pour l'exemple
+  var maintenanceData = {
+    labels: ['Révision', 'Réparation', 'Vidange', 'Pneus'],
+    datasets: [{
+      data: [30, 20, 25, 15],  // Remplacez par vos données dynamiques
+      backgroundColor: ['#e74c3c', '#3498db', '#f39c12', '#2ecc71'],
+    }]
+  };
+
+  // Configuration du graphique
+  var ctx = document.getElementById('maintenanceChart').getContext('2d');
+  var maintenanceChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: maintenanceData,
+    options: {
+      responsive: true,
+      legend: {
+        position: 'bottom',
+      },
+      tooltips: {
+        callbacks: {
+          label: function (tooltipItem, data) {
+            var dataset = data.datasets[tooltipItem.datasetIndex];
+            var total = dataset.data.reduce(function (previousValue, currentValue, currentIndex, array) {
+              return previousValue + currentValue;
+            });
+            var currentValue = dataset.data[tooltipItem.index];
+            var percentage = Math.floor(((currentValue / total) * 100) + 0.5);
+            return percentage + '%';
+          }
+        }
+      }
+    }
+  });
+</script>
+
+<style>
+  body {
+    background-color: #f5f5f5;
+  }
+
+  .section-title {
+    margin-left: 15px;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+    text-transform: uppercase;
+    font-weight: bold;
+    position: relative;
+  }
+
+  .section-title::after {
+    content: '';
+    width: 50px;
+    height: 3px;
+    background-color: #5e72e4;
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+  }
+
+  .profile-card {
+    background-color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    color: #172b4d;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .user-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+  }
+
+  .user-table th {
+    text-align: left;
+    padding: 10px 15px;
+    background-color: #e9ecef;
+    border-top: none;
+    border-bottom: 2px solid #dee2e6;
+  }
+
+  .user-table td {
+    padding: 15px;
+    vertical-align: middle;
+    background-color: #fff;
+    border-top: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .user-info .d-flex {
+    align-items: center;
+  }
+
+  .user-info img {
+    border: 2px solid #dee2e6;
+  }
+
+  .status-info .d-flex {
+    margin-left: -60px;
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .status-dot.online {
+    background-color: #28a745;
+  }
+
+  .status-dot.offline {
+    background-color: #dc3545;
+  }
+
+  .ml-3 {
+    margin-left: 1rem !important;
+  }
+
+  .ml-2 {
+    margin-left: 0.5rem !important;
+  }
+
+  .header-icon {
+    font-size: 2rem;
+    color: #5e72e4;
+    margin-right: 10px;
+  }
+
+  .profile-card .card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+</style>
+
+<!-- Page content -->
+<div class="row">
+  <div class="col-12">
+    <h3 class="section-title"><i class="fas fa-users header-icon"></i>Profils connectés</h3>
+    <div class="container-fluid">
+      <div class="card profile-card">
+        <div class="card-body">
+          <table class="user-table table">
+            <thead>
+              <tr>
+                <th>Utilisateurs</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for profile in connected_profiles %}
+              <tr>
+                <td class="user-info">
+                  <div class="d-flex align-items-center">
+                    <div>
+                      {% if profile.profile_image %}
+                      <img src="{{ profile.profile_image.url }}" alt="" width="35" height="35" class="rounded-circle">
+                      {% else %}
+                      <img src="" alt="" width="35" height="35" class="rounded-circle">
+                      {% endif %}
+                    </div>
+                    <div class="ml-3">
+                      <b>{{ profile.user.username }}</b>
+                      <br>
+                      <small>
+                        {% if profile.role == 1 %}
+                        Administrateur
+                        {% elif profile.role == 2 %}
+                        Manager
+                        {% elif profile.role == 3 %}
+                        Agent
+                        {% endif %}
+                      </small>
+                    </div>
+                  </div>
+                </td>
+                <td class="status-info">
+                  <div class="d-flex align-items-center">
+                    <span class="status-dot {% if profile.is_online %}online{% else %}offline{% endif %}"></span>
+                    <b class="ml-2">{% if profile.is_online %}Connecté{% else %}Hors ligne{% endif %}</b>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% include "includes/footer.html" %}
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+
+<script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
+<script src="/static/assets/vendor/chart.js/dist/Chart.extension.js"></script>
+
+{% endblock javascripts %}

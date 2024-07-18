@@ -1,0 +1,26 @@
+{% extends 'layouts/base.html' %} {% block content %}
+<div class="container">
+    <h2>Affecter une voiture à un conducteur</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label class="col-form-label" for="conducteur">Sélectionner un conducteur:</label>
+            <select class="form-control" id="conducteur" name="conducteur">
+                {% for conducteur in conducteurs %}
+                <option value="{{ conducteur.id }}">{{ conducteur.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Affecter</button>
+    </form>
+    {% if messages %}
+    <div>
+        {% for message in messages %}
+        <ul>
+            <li>{{message}}</li>
+        </ul>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

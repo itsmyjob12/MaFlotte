@@ -1,0 +1,127 @@
+<nav class="navbar navbar-top navbar-expand navbar-dark bg-custom border-bottom">
+  <div class="container-fluid">
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <!-- Search form -->
+      <form class="navbar-search navbar-search-light form-inline mr-sm-3" id="navbar-search-main">
+        <div class="form-group mb-0">
+          <div class="input-group input-group-alternative input-group-merge">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fas fa-search"></i></span>
+            </div>
+            <input class="form-control" placeholder="Rechercher" type="text">
+          </div>
+        </div>
+        <button type="button" class="close" data-action="search-close" data-target="#navbar-search-main"
+          aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </form>
+      <!-- Navbar links -->
+      <ul class="navbar-nav align-items-center ml-auto ml-md-0">
+        <li class="nav-item dropdown">
+          <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
+            <div class="media align-items-center">
+              <span class="avatar avatar-sm rounded-circle">
+                <img alt="Image placeholder" src="/static/assets/img/theme/5-3.webp">
+              </span>
+              <div class="media-body ml-2 d-none d-lg-block">
+                <span class="mb-0 text-sm font-weight-bold">{{ request.user.username }}</span>
+              </div>
+            </div>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right">
+            <div class="dropdown-header noti-title">
+              <h6 class="text-overflow m-0">Bienvenue!</h6>
+            </div>
+            <a href="/profile.html" class="dropdown-item">
+              <i class="ni ni-single-02"></i>
+              <span>Mon profil</span>
+            </a>
+            <a target="_blank" href="http://appseed.us/support" class="dropdown-item">
+              <i class="ni ni-support-16"></i>
+              <span>Support</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="{% url 'logout' %}" class="dropdown-item">
+              <i class="ni ni-user-run text-red"></i>
+              <span>Déconnexion</span>
+            </a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<style>
+  .navbar-search {
+    margin-right: 20px;
+    /* Exemple de marge à droite pour séparer visuellement les éléments */
+  }
+
+  .navbar-search .input-group {
+    padding: 8px;
+    /* Espacement interne pour la barre de recherche */
+  }
+
+  .bg-custom {
+    background-color: #4a90e2;
+    /* Couleur bleue personnalisée */
+  }
+
+  .navbar-search .input-group-prepend .input-group-text {
+    background-color: #357ABD;
+    /* Couleur légèrement plus foncée pour le contraste */
+    color: #fff;
+  }
+
+  .navbar-search .form-control {
+    border-color: #357ABD;
+  }
+
+  .navbar-search .form-control:focus {
+    box-shadow: none;
+    border-color: #357ABD;
+  }
+
+  .navbar-nav .nav-link {
+    color: #fff;
+  }
+
+  .navbar-nav .nav-link:hover {
+    color: #d1ecf1;
+    /* Couleur de survol */
+  }
+
+  .dropdown-menu {
+    background-color: #f8f9fa;
+    /* Couleur de fond du menu déroulant */
+  }
+
+  .dropdown-item {
+    color: #212529;
+    /* Couleur du texte des éléments du menu */
+  }
+
+  .dropdown-item:hover {
+    background-color: #e9ecef;
+    /* Couleur de survol des éléments du menu */
+    color: #212529;
+  }
+
+  .navbar .avatar {
+    border: 2px solid #fff;
+    /* Bordure blanche autour de l'avatar */
+  }
+
+  .navbar .media-body .text-sm {
+    color: #fff;
+    /* Couleur blanche pour le nom d'utilisateur */
+  }
+
+  .ni-user-run {
+    color: #dc3545;
+    /* Couleur rouge pour l'icône de déconnexion */
+  }
+</style>

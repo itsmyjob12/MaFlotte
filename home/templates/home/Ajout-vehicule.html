@@ -1,0 +1,362 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- partial -->
+
+<style>
+  /* Styles généraux pour le tableau de bord */
+  .main-panel {
+    background-color: #f4f5f7;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Styles pour les cartes */
+  .card {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-body {
+    padding: 20px;
+  }
+
+  .card-title {
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+    color: #2c3e50;
+  }
+
+  /* Styles pour les formulaires */
+  .form-group.row {
+    margin-bottom: 15px;
+  }
+
+  .form-control {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    padding: 10px;
+  }
+
+  .form-control:focus {
+    border-color: #5c6bc0;
+    box-shadow: 0 0 5px rgba(92, 107, 192, 0.5);
+  }
+
+  .btn-gradient-primary {
+    background: linear-gradient(45deg, #5c6bc0, #3949ab);
+    border: none;
+    color: #fff;
+  }
+
+  .btn-light {
+    background: #fff;
+    border: 1px solid #ced4da;
+    color: #495057;
+  }
+
+  .btn-gradient-primary:hover,
+  .btn-light:hover {
+    opacity: 0.9;
+  }
+
+  /* Styles pour le sélecteur de fichier */
+  #file-upload {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+  }
+
+  #file-preview {
+    margin-top: 15px;
+    max-height: 300px;
+    max-width: 100%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Styles pour les textes d'output et de messages d'erreur */
+  .output {
+    font-weight: bold;
+    color: #333;
+  }
+
+  .text-danger {
+    color: #d9534f;
+  }
+
+  /* Styles pour la zone d'aperçu de l'image */
+  #file-preview {
+    display: block;
+    max-height: 300px;
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<style>
+  .page-header {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .page-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+  }
+
+  form {
+    /* Style de votre formulaire */
+    margin-top: 20px;
+    /* Espacement supérieur pour que le formulaire ne colle pas à l'en-tête */
+  }
+</style>
+</head>
+
+<body>
+
+  <div class="page-header">
+    <h3 class="page-title"> Fleet_Manager</h3>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+      </ol>
+    </nav>
+  </div>
+  <div class="container my-5">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h4 class="card-title">Ajout de véhicule</h4>
+            <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="marque_voiture" class="form-label">Marque</label>
+                <select class="form-select" name="marque_voiture" id="marque_voiture_select"
+                  onchange="changeModeleList()" required>
+                  <option value="" disabled selected>Sélectionner une marque</option>
+                  {% for marque in marques %}
+                  <option value="{{ marque.id }}">{{ marque.marque }}</option>
+                  {% endfor %}
+                </select>
+                <div class="invalid-feedback">Veuillez sélectionner une marque.</div>
+              </div>
+              <div class="mb-3">
+                <label for="modele" class="form-label">Modèle</label>
+                <select class="form-select" name="modele" id="modele_select" required>
+                  <option value="" disabled selected>Sélectionner le modèle</option>
+                  {% for modele in modeles %}
+                  <option value="{{ modele.id }}">{{ modele.nom }}</option>
+                  {% endfor %}
+                  <option value="autre">Autre</option>
+                </select>
+                <div class="invalid-feedback">Veuillez sélectionner un modèle.</div>
+              </div>
+              <div class="mb-3">
+                <label for="couleur_voiture" class="form-label">Couleur</label>
+                <input type="text" class="form-control" name="couleur_voiture" id="couleur_voiture"
+                  placeholder="Couleur de la voiture" required>
+                <div class="invalid-feedback">Veuillez entrer la couleur de la voiture.</div>
+              </div>
+              <div class="mb-3">
+                <label for="annee_fabrication" class="form-label">Année de fabrication</label>
+                <input type="date" class="form-control" name="annee_fabrication" id="annee_fabrication"
+                  placeholder="Année de fabrication" required>
+                <div class="invalid-feedback">Veuillez entrer l'année de fabrication.</div>
+              </div>
+              <div class="mb-3">
+                <label for="kilometrage" class="form-label">Kilométrage</label>
+                <input type="number" class="form-control" name="kilometrage" id="kilometrage" placeholder="Kilométrage"
+                  required>
+                <div class="invalid-feedback">Veuillez entrer le kilométrage.</div>
+              </div>
+              <div class="mb-3">
+                <label for="type_carburant" class="form-label">Type de carburant</label>
+                <select class="form-select" name="type_carburant" id="type_carburant" required>
+                  <option value="" disabled selected>Sélectionner le type de carburant</option>
+                  <option value="Gasoil">Gasoil</option>
+                  <option value="Super">Super</option>
+                  <option value="Essence">Essence</option>
+                </select>
+                <div class="invalid-feedback">Veuillez sélectionner le type de carburant.</div>
+              </div>
+              <div class="mb-3">
+                <label for="transmission" class="form-label">Transmission</label>
+                <select class="form-select" name="transmission" id="transmission" required>
+                  <option value="" disabled selected>Sélectionner la transmission</option>
+                  <option value="Manuelle">Manuelle</option>
+                  <option value="Automatique">Automatique</option>
+                </select>
+                <div class="invalid-feedback">Veuillez sélectionner la transmission.</div>
+              </div>
+              <div class="mb-3">
+                <label for="numero_serie" class="form-label">Numéro de série</label>
+                <input type="text" class="form-control" name="numero_serie" id="numero_serie"
+                  placeholder="Numéro de série" required>
+                <div class="invalid-feedback">Veuillez entrer le numéro de série.</div>
+              </div>
+              <div class="mb-3">
+                <label for="numero_chassi" class="form-label">Numéro de châssis</label>
+                <input type="text" class="form-control" name="numero_chassi" id="numero_chassi"
+                  placeholder="Numéro de châssis" required>
+                <div class="invalid-feedback">Veuillez entrer le numéro de châssis.</div>
+              </div>
+              <div class="mb-3">
+                <label for="immatriculation" class="form-label">Numéro Matricule</label>
+                <input type="text" class="form-control" name="immatriculation" id="immatriculation"
+                  placeholder="Immatriculation" required>
+                <div class="invalid-feedback">Veuillez entrer le numéro matricule.</div>
+              </div>
+              <div class="mb-3">
+                <label for="symptomes" class="form-label">Symptômes</label>
+                <textarea class="form-control" name="symptomes" id="symptomes"
+                  placeholder="Symptômes  (bruits, vibrations, odeurs, etc.)" required></textarea>
+                <div class="invalid-feedback">Veuillez décrire les symptômes.</div>
+              </div>
+              <div class="mb-3">
+                <label for="historique_maintenance" class="form-label">Historique de maintenance</label>
+                <textarea class="form-control" name="historique_maintenance" id="historique_maintenance"
+                  placeholder="Historique de maintenance" required></textarea>
+                <div class="invalid-feedback">Veuillez entrer l'historique de maintenance.</div>
+              </div>
+              <div class="mb-3">
+                <label for="nombre_de_vitesse" class="form-label">Nombre de vitesses</label>
+                <input type="range" class="form-range" name="nombre_de_vitesse" id="nombre_de_vitesse" min="1" max="10"
+                  value="5" required>
+                <output for="nombre_de_vitesse" id="vitesse_value">5</output>
+                <div class="invalid-feedback">Veuillez sélectionner le nombre de vitesses.</div>
+              </div>
+              <div class="mb-3">
+                <label for="photo_voiture" class="form-label">Photo de la voiture</label>
+                <input type="file" class="form-control" name="photo_voiture" accept=".jpg, .jpeg, .png" id="file-upload"
+                  placeholder="Photo de la voiture" required>
+                <div class="invalid-feedback">Veuillez télécharger une photo de la voiture.</div>
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+              <a href="#" class="btn btn-secondary">Cancel</a>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-body text-center">
+            <h4 class="card-title">Aperçu de l'image sélectionnée</h4>
+            <img src="#" alt="Visionnage de l'image sélectionnée" id="file-preview" class="img-fluid" />
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- content-wrapper ends -->
+  <!-- partial:partials/_footer.html -->
+  {% include "includes/footer.html" %}
+  <!-- partial -->
+  </div>
+  <!-- main-panel ends -->
+  </div>
+  <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+  <!-- plugins:js -->
+  <script src="{% static 'assets1/vendors/js/vendor.bundle.base.js' %}"></script>
+  <!-- endinject -->
+  <!-- Plugin js for this page -->
+  <!-- End plugin js for this page -->
+  <!-- inject:js -->
+
+
+  <script>
+    // Sélectionnez l'élément d'entrée de type fichier et l'élément image
+    const fileUpload = document.getElementById("file-upload");
+    const filePreview = document.getElementById("file-preview");
+
+    // Ajoutez un écouteur d'événements pour détecter les changements dans le fichier sélectionné
+    fileUpload.addEventListener("change", function () {
+      // Vérifiez si un fichier a été sélectionné
+      if (fileUpload.files && fileUpload.files[0]) {
+        // Créez un objet URL pour l'aperçu de l'image
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          // Mettez à jour la source de l'image avec l'URL de l'aperçu
+          filePreview.src = e.target.result;
+        };
+        // Chargez le fichier en tant que données URL
+        reader.readAsDataURL(fileUpload.files[0]);
+      }
+    });
+  </script>
+
+
+
+
+  <script>
+    //  JS pour nombre de vitesse 
+    document.addEventListener("DOMContentLoaded", function () {
+      var vitesseRange = document.getElementById("nombre_de_vitesse");
+      var vitesseValue = document.getElementById("vitesse_value");
+
+      vitesseRange.addEventListener("input", function () {
+        vitesseValue.textContent = this.value;
+      });
+    });
+  </script>
+
+
+
+
+
+  <script>
+    // Récupère le JSON des associations entre les marques et les modèles
+    var modelesData = JSON.parse('{{ modeles_data|escapejs }}');
+
+    // Fonction pour changer la liste des modèles en fonction de la marque sélectionnée
+    function changeModeleList() {
+      var marqueSelect = document.getElementById("marque_voiture_select");
+      var modeleSelect = document.getElementById("modele_select");
+      var selectedMarqueId = marqueSelect.value;
+
+      // Supprime les options actuelles du select des modèles
+      modeleSelect.innerHTML = '<option value="">Sélectionner le modèle</option>';
+
+      // Ajoute les options des modèles associés à la marque sélectionnée
+      if (selectedMarqueId && modelesData[selectedMarqueId]) {
+        modelesData[selectedMarqueId].forEach(function (modele) {
+          var option = document.createElement("option");
+          option.text = modele.nom;
+          option.value = modele.id;
+          modeleSelect.appendChild(option);
+        });
+      }
+    }
+  </script>
+  <script src="{% static 'assets1/js/off-canvas.js' %}"></script>
+  <script src="{% static 'assets1/js/misc.js' %}"></script>
+  <script src="{% static 'assets1/js/settings.js' %}"></script>
+  <script src="{% static 'assets1/js/todolist.js' %}"></script>
+  <script src="{% static 'assets1/js/jquery.cookie.js' %}"></script>
+  <!-- endinject -->
+  <!-- Custom js for this page -->
+  <!-- End custom js for this page -->
+</body>
+
+</html>
+{% endblock content %}
+
+{% block javascripts %}{% endblock javascripts %}
