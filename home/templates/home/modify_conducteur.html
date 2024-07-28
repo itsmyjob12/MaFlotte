@@ -1,0 +1,145 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    /* Styles pour le formulaire de modification */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        border-radius: 5px;
+        border: 1px solid #ced4da;
+        padding: 10px;
+    }
+
+    .form-control:focus {
+        border-color: #5c6bc0;
+        box-shadow: 0 0 5px rgba(92, 107, 192, 0.5);
+    }
+
+    .btn-gradient-primary {
+        background: linear-gradient(45deg, #5c6bc0, #3949ab);
+        border: none;
+        color: #fff;
+    }
+
+    .btn-light {
+        background: #fff;
+        border: 1px solid #ced4da;
+        color: #495057;
+    }
+
+    .btn-gradient-primary:hover,
+    .btn-light:hover {
+        opacity: 0.9;
+    }
+
+    #file-preview {
+        display: block;
+        max-height: 300px;
+        margin: 20px auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<div class="page-header">
+    <h3 class="page-title">Fleet Manager</h3>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+        </ol>
+    </nav>
+</div>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-6 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Modifier le Conducteur</h4>
+                        <form method="post" enctype="multipart/form-data" class="forms-sample">
+                            {% csrf_token %}
+                            <div class="form-group row">
+                                <label for="nom_conducteur" class="col-sm-3 col-form-label">Nom du conducteur</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="name" id="nom_conducteur"
+                                        placeholder="Nom du conducteur" value="{{ conducteur.name }}" required />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="adresse" class="col-sm-3 col-form-label">Adresse</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="adresse" id="adresse"
+                                        placeholder="Adresse du conducteur" value="{{ conducteur.adresse }}" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="telephone" class="col-sm-3 col-form-label">Numéro de téléphone</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="telephone" id="telephone"
+                                        placeholder="Téléphone du conducteur" value="{{ conducteur.telephone }}" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="site_web" class="col-sm-3 col-form-label">Site web</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="site_web" id="site_web"
+                                        placeholder="Site web du conducteur" value="{{ conducteur.site_web }}" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="email" class="col-sm-3 col-form-label">Adresse e-mail</label>
+                                <div class="col-sm-9">
+                                    <input type="email" class="form-control" name="email" id="email"
+                                        placeholder="Email du conducteur" value="{{ conducteur.email }}" required />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="photo_conducteur" class="col-sm-3 col-form-label">Photo du
+                                    conducteur</label>
+                                <div class="col-sm-9">
+                                    <input type="file" class="form-control" name="photo_conducteur"
+                                        accept=".jpg, .jpeg, .png" id="file-upload" />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-gradient-primary me-2">Enregistrer</button>
+                            <a href="{% url 'list_conducteur' %}" class="btn btn-light">Annuler</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">Aperçu de l'image sélectionnée</h4>
+                        <img src="{{ conducteur.photo_conducteur.url }}" alt="Aperçu de l'image sélectionnée"
+                            id="file-preview" class="img-fluid" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include "includes/footer.html" %}
+</div>
+
+<script>
+    // Sélectionnez l'élément d'entrée de type fichier et l'élément image
+    const fileUpload = document.getElementById("file-upload");
+    const filePreview = document.getElementById("file-preview");
+
+    // Ajoutez un écouteur d'événements pour détecter les changements dans le fichier sélectionné
+    fileUpload.addEventListener("change", function () {
+        if (fileUpload.files && fileUpload.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                filePreview.src = e.target.result;
+            };
+            reader.readAsDataURL(fileUpload.files[0]);
+        }
+    });
+</script>
+
+{% endblock content %}

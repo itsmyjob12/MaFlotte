@@ -1,14 +1,249 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
+<!-- partial -->
+
+<style>
+    /* Styles généraux pour le tableau de bord */
+    .main-panel {
+        background-color: #f4f5f7;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Styles pour les cartes */
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .card-title {
+        font-weight: 600;
+        font-size: 1.25rem;
+        margin-bottom: 20px;
+        color: #2c3e50;
+    }
+
+    /* Styles pour les formulaires */
+    .form-group.row {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        border-radius: 5px;
+        border: 1px solid #ced4da;
+        padding: 10px;
+    }
+
+    .form-control:focus {
+        border-color: #5c6bc0;
+        box-shadow: 0 0 5px rgba(92, 107, 192, 0.5);
+    }
+
+    .btn-gradient-primary {
+        background: linear-gradient(45deg, #5c6bc0, #3949ab);
+        border: none;
+        color: #fff;
+    }
+
+    .btn-light {
+        background: #fff;
+        border: 1px solid #ced4da;
+        color: #495057;
+    }
+
+    .btn-gradient-primary:hover,
+    .btn-light:hover {
+        opacity: 0.9;
+    }
+
+    /* Styles pour le sélecteur de fichier */
+    #file-upload {
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ced4da;
+    }
+
+    #file-preview {
+        margin-top: 15px;
+        max-height: 300px;
+        max-width: 100%;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Styles pour les textes d'output et de messages d'erreur */
+    .output {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .text-danger {
+        color: #d9534f;
+    }
+
+    /* Styles pour la zone d'aperçu de l'image */
+    #file-preview {
+        display: block;
+        max-height: 300px;
+        margin: 20px auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-header {
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    form {
+        /* Style de votre formulaire */
+        margin-top: 20px;
+        /* Espacement supérieur pour que le formulaire ne colle pas à l'en-tête */
+    }
+</style>
 
 <body>
-    Maintenance
-</body>
 
-</html>
+    <div class="page-header">
+        <h3 class="page-title">Gestion de la Maintenance</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+            </ol>
+        </nav>
+    </div>
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title">Ajouter une Réparation</h4>
+                        <form method="post" action="{% url 'ajouter_reparation' %}" enctype="multipart/form-data"
+                            class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="voiture" class="form-label">Véhicule</label>
+                                <select class="form-select" name="voiture" id="voiture_select" required>
+                                    <option value="" disabled selected>Sélectionner un véhicule</option>
+                                    {% for voiture in voitures %}
+                                    <option value="{{ voiture.id }}">{{ voiture.marque }} - {{ voiture.modele }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Veuillez sélectionner un véhicule.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" name="description" id="description"
+                                    placeholder="Description de la réparation" required></textarea>
+                                <div class="invalid-feedback">Veuillez entrer une description.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="date_reparation" class="form-label">Date de Réparation</label>
+                                <input type="date" class="form-control" name="date_reparation" id="date_reparation"
+                                    required>
+                                <div class="invalid-feedback">Veuillez entrer la date de réparation.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cout" class="form-label">Coût</label>
+                                <input type="number" class="form-control" name="cout" id="cout"
+                                    placeholder="Coût de la réparation" step="0.01" required>
+                                <div class="invalid-feedback">Veuillez entrer le coût de la réparation.</div>
+                            </div>
+                            <button type="submit" class="btn btn-gradient-primary">Ajouter</button>
+                            <a href="{% url 'maintenance' %}" class="btn btn-light">Annuler</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- content-wrapper ends -->
+    <!-- partial:partials/_footer.html -->
+    {% include "includes/footer.html" %}
+    <!-- partial -->
+    </div>
+    <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="{% static 'assets1/vendors/js/vendor.bundle.base.js' %}"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+
+    <script>
+        // Sélectionnez l'élément d'entrée de type fichier et l'élément image
+        const fileUpload = document.getElementById("file-upload");
+        const filePreview = document.getElementById("file-preview");
+
+        // Ajoutez un écouteur d'événements pour détecter les changements dans le fichier sélectionné
+        fileUpload.addEventListener("change", function () {
+            // Vérifiez si un fichier a été sélectionné
+            if (fileUpload.files && fileUpload.files[0]) {
+                // Créez un objet URL pour l'aperçu de l'image
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    // Mettez à jour la source de l'image avec l'URL de l'aperçu
+                    filePreview.src = e.target.result;
+                };
+                // Chargez le fichier en tant que données URL
+                reader.readAsDataURL(fileUpload.files[0]);
+            }
+        });
+    </script>
+
+    <script>
+        // Récupère le JSON des associations entre les marques et les modèles
+        var modelesData = JSON.parse('{{ modeles_data|escapejs }}');
+
+        // Fonction pour changer la liste des modèles en fonction de la marque sélectionnée
+        function changeModeleList() {
+            var marqueSelect = document.getElementById("marque_voiture_select");
+            var modeleSelect = document.getElementById("modele_select");
+            var selectedMarqueId = marqueSelect.value;
+
+            // Supprime les options actuelles du select des modèles
+            modeleSelect.innerHTML = '<option value="">Sélectionner le modèle</option>';
+
+            // Ajoute les options correspondant à la marque sélectionnée
+            if (modelesData[selectedMarqueId]) {
+                modelesData[selectedMarqueId].forEach(function (modele) {
+                    var option = document.createElement("option");
+                    option.value = modele.id;
+                    option.textContent = modele.nom;
+                    modeleSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Ajoute l'écouteur d'événements au changement de la sélection de marque
+        document.getElementById("marque_voiture_select").addEventListener("change", changeModeleList);
+    </script>
+    {% endblock %}

@@ -13,18 +13,15 @@ from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
 from django.contrib.auth import get_user_model
 from django.template.loader import render_to_string
+from .models import Reparation
+from django.views.decorators.http import require_POST
+import datetime
+from django.http import HttpResponseBadRequest
 
 
 @login_required(login_url="/login/")
 def index(request):
-    nombre_conducteur = Conducteur.objects.count()
-    marques = MarqueVoiture.objects.all()
-    nombre_Voiture = Voiture.objects.count()
-    connected_profiles = Profile.objects.filter(is_online=True)
-    nombre_profile = Profile.objects.count()
-    return render(request,'home/index.html' ,{'nombre_conducteur': nombre_conducteur, 'nombre_Voiture': nombre_Voiture, 'nombre_profile': nombre_profile, 'connected_profiles': connected_profiles}) 
-
-    context = {'segment': 'index', 'marques':marques}
+    
 
     html_template = loader.get_template('home/index.html')
     return HttpResponse(html_template.render(context, request))
@@ -85,8 +82,6 @@ def new_voiture(request):
         kilometrage = request.POST.get("kilometrage")
         type_carburant = request.POST.get("type_carburant")
         transmission = request.POST.get("transmission")
-        symptomes = request.POST.get("symptomes")
-        historique_maintenance = request.POST.get("historique_maintenance")
         codes_erreur = request.POST.get("codes_erreur")
         numero_chassi = request.POST.get("numero_chassi")
         nombre_de_vitesse = request.POST.get("nombre_de_vitesse")
@@ -111,8 +106,6 @@ def new_voiture(request):
             numero_serie=numero_serie,
             immatriculation=immatriculation,
             couleur_voiture=couleur_voiture,
-            symptomes=symptomes,
-            historique_maintenance=historique_maintenance,
             codes_erreur=codes_erreur,
             numero_chassi=numero_chassi,
             nombre_de_vitesse=nombre_de_vitesse,
@@ -126,22 +119,78 @@ def new_voiture(request):
         messages.success(request, f'Voiture {add_voiture.modele} a été bien ajoutée!')
         return redirect('liste_voiture')
 
-    datas = {
+    context = {
         'marques': marques,
         'modeles': modeles,
         # Envoi du dictionnaire en JSON
         'modeles_data': json.dumps(modeles_data),
+        'segment': 'ajout_vehicule',
     }
-    return render(request, 'home/Ajout-vehicule.html', datas)
+    return render(request, 'home/Ajout-vehicule.html', context)
+
+
+
+
+def edit_voiture(request, voiture_id):
+    try:
+        voiture = Voiture.objects.get(pk=voiture_id)
+    except Voiture.DoesNotExist:
+        messages.error(request, "La voiture sélectionnée n'existe pas.")
+        return redirect('liste_voiture')
+
+    marques = MarqueVoiture.objects.all()
+    modeles = Modele.objects.all()
+    modeles_data = {}
+    for modele in modeles:
+        if modele.marque_id not in modeles_data:
+            modeles_data[modele.marque_id] = []
+        modeles_data[modele.marque_id].append({'id': modele.id, 'nom': modele.nom})
+
+    if request.method == "POST":
+        voiture.marque_voiture_id = request.POST.get("marque_voiture")
+        voiture.modele_id = request.POST.get("modele")
+        voiture.immatriculation = request.POST.get("immatriculation")
+        voiture.numero_serie = request.POST.get("numero_serie")
+        voiture.couleur_voiture = request.POST.get("couleur_voiture")
+        voiture.annee_fabrication = request.POST.get("annee_fabrication")
+        voiture.kilometrage = request.POST.get("kilometrage")
+        voiture.type_carburant = request.POST.get("type_carburant")
+        voiture.transmission = request.POST.get("transmission")
+        voiture.codes_erreur = request.POST.get("codes_erreur")
+        voiture.numero_chassi = request.POST.get("numero_chassi")
+        voiture.nombre_de_vitesse = request.POST.get("nombre_de_vitesse")
+        photo_voiture = request.FILES.get("photo_voiture")
+        
+        if photo_voiture:
+            voiture.photo_voiture = photo_voiture
+
+        voiture.save()
+        messages.success(request, f'Voiture {voiture.modele} a été mise à jour!')
+        return redirect('liste_voiture')
+
+    datas = {
+        'marques': marques,
+        'modeles': modeles,
+        'modeles_data': json.dumps(modeles_data),
+        'voiture': voiture,
+    }
+    return render(request, 'home/Edit-vehicule.html', datas)
+
+
 
 
 def new_conducteur(request):
+    context = {
+        'segment': 'ajout_conducteur',
+    }
+    
     if request.method == 'POST':
         name = request.POST.get('name').strip()
         adresse = request.POST.get('adresse')
         telephone = request.POST.get('telephone')
         site_web = request.POST.get('site_web')
         email = request.POST.get('email').strip()
+        genre = request.POST.get('genre')
         photo_conducteur = request.FILES.get('photo_conducteur')
 
         # Valider les champs obligatoires
@@ -161,6 +210,7 @@ def new_conducteur(request):
             site_web=site_web,
             email=email,
             photo_conducteur=photo_conducteur,
+            genre=genre,
             user=user,
         )
 
@@ -172,9 +222,10 @@ def new_conducteur(request):
         recipient_list = [email]
         send_mail(subject, message, from_email, recipient_list, fail_silently=False)
 
-        return redirect('home')  # Rediriger vers une page appropriée après la création
+        return redirect('list_conducteur')  # Rediriger vers une page appropriée après la création
 
-    return render(request, 'home/Ajout-conducteur.html')
+    return render(request, 'home/Ajout-conducteur.html', context)
+
 
 def activate_conducteur_role(request, user_id):
     if request.method == 'GET':
@@ -192,27 +243,33 @@ def activate_conducteur_role(request, user_id):
 #  liste des conducteurs
 def list_conducteur(request):
     conducteurs = Conducteur.objects.all().order_by('-id')
-    datas = {
+    context = {
         'conducteurs': conducteurs,
+        'segment': 'list_conducteur',
     }
-    return render(request, 'home/liste-conducteur.html', datas)
+    return render(request, 'home/liste-conducteur.html', context)
+
 
 
 def list_voitures(request):
     voitures = Voiture.objects.all().order_by('-id')
-    datas = {
+    context = {
         'voitures': voitures,
+        'segment': 'liste_voiture',
     }
-    return render(request, 'home/liste-vehicule.html', datas)
+    return render(request, 'home/liste-vehicule.html', context)
 
 
+def delete_voiture(request, voiture_id):
+    # Utilisez get_object_or_404 pour obtenir l'objet ou renvoyer une erreur 404 si non trouvé
+    voiture = get_object_or_404(Voiture, id=voiture_id)
 
-def detail_conducteurs(request, conducteur_id):
-    conducteurs = Conducteur.objects.get(id=conducteur_id)
-    datas = {
-        'conducteurs': conducteurs,
-    }
-    return render(request, 'home/conducteur.html', datas)
+    if request.method == 'POST':
+        voiture.delete()
+        messages.success(request, "Voiture supprimée avec succès!")
+        return redirect('liste_voiture')  # Assurez-vous que 'liste_voiture' est bien défini
+    # Redirigez vers la liste des voitures pour les requêtes GET ou autres
+    return redirect('liste_voiture')  
 
 
 def detail_voiture(request, voiture_id):
@@ -223,19 +280,16 @@ def detail_voiture(request, voiture_id):
     return render(request, 'home/vehicule.html', datas)
 
 
-def dashboard_particulier(request):
-    user = request.user
-    # Ajoutez ici la logique spécifique aux particuliers
-    voitures = Voiture.objects.filter(owner=user)
-    diagnostics = Diagnostic.objects.filter(voiture__owner=user)
-
-    context = {
-        'voitures': voitures,
-        'diagnostics': diagnostics,
-        'user': user,
+def detail_conducteurs(request, conducteur_id):
+    conducteurs = Conducteur.objects.get(id=conducteur_id)
+    datas = {
+        'conducteurs': conducteurs,
     }
-    return render(request, 'home/dashboard_particulier.html', context)
+    return render(request, 'home/conducteur.html', datas)
 
+
+
+@login_required
 def profile(request):
     # Votre logique pour la vue profile
     return render(request, 'home/profile.html')
@@ -284,3 +338,161 @@ def affect_voiture(request, voiture_id):
         'conducteurs': conducteurs
     }
     return render(request, 'home/affect_voiture.html', contexts)
+
+def modify_conducteur(request, conducteur_id):
+    conducteur = get_object_or_404(Conducteur, id=conducteur_id)
+    
+    if request.method == 'POST':
+        name = request.POST.get('name', conducteur.name).strip()
+        adresse = request.POST.get('adresse', conducteur.adresse)
+        telephone = request.POST.get('telephone', conducteur.telephone)
+        site_web = request.POST.get('site_web', conducteur.site_web)
+        email = request.POST.get('email', conducteur.email).strip()
+        photo_conducteur = request.FILES.get('photo_conducteur')
+
+        # Valider les champs obligatoires
+        if not name or not email:
+            return HttpResponseBadRequest("Name and email are required.")
+
+        # Mise à jour des attributs du conducteur
+        conducteur.name = name
+        conducteur.adresse = adresse
+        conducteur.telephone = telephone
+        conducteur.site_web = site_web
+        conducteur.email = email
+        if photo_conducteur:
+            conducteur.photo_conducteur = photo_conducteur
+        
+        # Enregistrez les modifications dans la base de données
+        conducteur.save()
+        
+        messages.success(request, "Conducteur modifié avec succès!")
+        return redirect('list_conducteur')
+    
+    return render(request, 'home/modify_conducteur.html', {'conducteur': conducteur})
+
+def delete_conducteur(request, conducteur_id):
+    conducteur = get_object_or_404(Conducteur, id=conducteur_id)
+    if request.method == 'POST':
+        conducteur.delete()
+        messages.success(request, "Conducteur supprimé avec succès!")
+        return redirect('list_conducteur')
+    return redirect('list_conducteur')
+
+
+def maintenance(request):
+    # Récupérer toutes les voitures
+    voitures = Voiture.objects.all()
+    return render(request, 'home/maintenance.html', {'voitures': voitures})
+
+def index(request):
+    nombre_conducteur = Conducteur.objects.count()
+    marques = MarqueVoiture.objects.all()
+    nombre_Voiture = Voiture.objects.count()
+    connected_profiles = Profile.objects.filter(is_online=True)
+    nombre_profile = Profile.objects.count()
+    
+    context = {
+        'nombre_conducteur': nombre_conducteur,
+        'nombre_Voiture': nombre_Voiture,
+        'nombre_profile': nombre_profile,
+        'connected_profiles': connected_profiles,
+        'segment': 'index',
+        'marques': marques
+    }
+    
+    return render(request, 'home/index.html', context)
+    
+    return render(request, 'home/index.html', context)
+
+def map_view(request):
+    context = {
+        'segment': 'map',
+    }
+    return render(request, 'home/map.html', context)
+
+def profile(request):
+    context = {
+        'segment': 'profile',
+    }
+    return render(request, 'home/profile.html', context)
+
+def liste_maintenances(request):
+    maintenances = Reparation.objects.all()
+    return render(request, 'home/liste_maintenances.html', {'maintenances': maintenances})
+
+
+@require_POST
+def ajouter_reparation(request):
+    voiture_id = request.POST.get('voiture')
+    description = request.POST.get('description')
+    date_reparation = request.POST.get('date_reparation')
+    cout = request.POST.get('cout')
+
+    # Vérification des champs requis
+    if not all([voiture_id, description, date_reparation, cout]):
+        return HttpResponseBadRequest("Tous les champs doivent être remplis.")
+
+    # Vérification de l'existence de la voiture
+    try:
+        voiture = Voiture.objects.get(pk=voiture_id)
+    except Voiture.DoesNotExist:
+        return HttpResponseBadRequest("La voiture spécifiée n'existe pas.")
+
+    # Vérification du format de la date
+    try:
+        date_reparation_obj = datetime.datetime.strptime(date_reparation, '%Y-%m-%d').date()
+    except ValueError:
+        return HttpResponseBadRequest("Le format de la date est incorrect.")
+
+    # Création de la réparation
+    Reparation.objects.create(
+        voiture=voiture,
+        description=description,
+        date_reparation=date_reparation_obj,
+        cout=cout,
+    )
+    
+    return redirect('maintenance')
+
+
+def modifier_reparation(request, pk):
+    reparation = get_object_or_404(Reparation, pk=pk)
+    voitures = Voiture.objects.all()
+
+    if request.method == 'POST':
+        # Obtenez les nouvelles valeurs des champs depuis les données POST
+        description = request.POST.get('description', reparation.description)
+        date_reparation = request.POST.get('date_reparation', reparation.date_reparation)
+        cout = request.POST.get('cout', reparation.cout)
+        voiture_id = request.POST.get('voiture', reparation.voiture.id)
+
+        # Vérifiez le format de la date
+        try:
+            date_reparation_obj = datetime.datetime.strptime(date_reparation, '%Y-%m-%d').date()
+        except ValueError:
+            return JsonResponse({'error': 'Le format de la date est incorrect.'}, status=400)
+        
+        # Trouvez la voiture sélectionnée
+        voiture = get_object_or_404(Voiture, pk=voiture_id)
+        
+        # Mettez à jour les champs
+        reparation.description = description
+        reparation.date_reparation = date_reparation_obj
+        reparation.cout = cout
+        reparation.voiture = voiture
+        reparation.save()
+
+        return redirect('liste_maintenances')
+
+    # Si la méthode n'est pas POST, affichez le formulaire avec les données actuelles
+    return render(request, 'home/edit_maintenance.html', {'reparation': reparation, 'voitures': voitures})
+    
+    # Si la méthode n'est pas POST, vous pouvez choisir de rendre un formulaire de modification
+
+
+@require_POST
+def supprimer_reparation(request, pk):
+    reparation = get_object_or_404(Reparation, pk=pk)
+    reparation.delete()
+    return redirect('maintenance')

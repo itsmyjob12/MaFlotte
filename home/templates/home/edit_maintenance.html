@@ -1,0 +1,243 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- partial -->
+
+<style>
+    /* Styles généraux pour le tableau de bord */
+    .main-panel {
+        background-color: #f4f5f7;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Styles pour les cartes */
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .card-title {
+        font-weight: 600;
+        font-size: 1.25rem;
+        margin-bottom: 20px;
+        color: #2c3e50;
+    }
+
+    /* Styles pour les formulaires */
+    .form-group.row {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        border-radius: 5px;
+        border: 1px solid #ced4da;
+        padding: 10px;
+    }
+
+    .form-control:focus {
+        border-color: #5c6bc0;
+        box-shadow: 0 0 5px rgba(92, 107, 192, 0.5);
+    }
+
+    .btn-gradient-primary {
+        background: linear-gradient(45deg, #5c6bc0, #3949ab);
+        border: none;
+        color: #fff;
+    }
+
+    .btn-light {
+        background: #fff;
+        border: 1px solid #ced4da;
+        color: #495057;
+    }
+
+    .btn-gradient-primary:hover,
+    .btn-light:hover {
+        opacity: 0.9;
+    }
+
+    /* Styles pour les textes d'output et de messages d'erreur */
+    .output {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .text-danger {
+        color: #d9534f;
+    }
+</style>
+
+<style>
+    .page-header {
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    form {
+        /* Style de votre formulaire */
+        margin-top: 20px;
+        /* Espacement supérieur pour que le formulaire ne colle pas à l'en-tête */
+    }
+</style>
+</head>
+
+<body>
+
+    <div class="page-header">
+        <h3 class="page-title"> Fleet_Manager</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+            </ol>
+        </nav>
+    </div>
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title">Modification de la Réparation</h4>
+                        <form method="post" action="{% url 'edit_maintenance' reparation.id %}"
+                            enctype="multipart/form-data" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="voiture" class="form-label">Véhicule</label>
+                                <select class="form-select" name="voiture" id="voiture_select" required>
+                                    <option value="" disabled>Sélectionner un véhicule</option>
+                                    {% for voiture in voitures %}
+                                    <option value="{{ voiture.id }}" {% if reparation.voiture.id == voiture.id %}selected{% endif %}>
+                                        {{ voiture.marque }} - {{ voiture.modele }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Veuillez sélectionner un véhicule.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" name="description" id="description"
+                                    placeholder="Description de la réparation"
+                                    required>{{ reparation.description }}</textarea>
+                                <div class="invalid-feedback">Veuillez entrer une description.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="date_reparation" class="form-label">Date de Réparation</label>
+                                <input type="date" class="form-control" name="date_reparation" id="date_reparation" value="{{ reparation.date_reparation|date:"Y-m-d" }}" required>
+                                <div class="invalid-feedback">Veuillez entrer la date de réparation.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cout" class="form-label">Coût</label>
+                                <input type="number" class="form-control" name="cout" id="cout"
+                                    placeholder="Coût de la réparation" step="0.01" value="{{ reparation.cout }}"
+                                    required>
+                                <div class="invalid-feedback">Veuillez entrer le coût de la réparation.</div>
+                            </div>
+                            <button type="submit" class="btn btn-gradient-primary">Enregistrer les
+                                modifications</button>
+                            <a href="{% url 'maintenance' %}" class="btn btn-light">Annuler</a>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">Aperçu de l'image sélectionnée</h4>
+                        <img src="#" alt="Visionnage de l'image sélectionnée" id="file-preview" class="img-fluid" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- content-wrapper ends -->
+    <!-- partial:partials/_footer.html -->
+    {% include "includes/footer.html" %}
+    <!-- partial -->
+    </div>
+    <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="{% static 'assets1/vendors/js/vendor.bundle.base.js' %}"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+
+    <script>
+        // Sélectionnez l'élément d'entrée de type fichier et l'élément image
+        const fileUpload = document.getElementById("file-upload");
+        const filePreview = document.getElementById("file-preview");
+
+        // Ajoutez un écouteur d'événements pour détecter les changements dans le fichier sélectionné
+        fileUpload.addEventListener("change", function () {
+            // Vérifiez si un fichier a été sélectionné
+            if (fileUpload.files && fileUpload.files[0]) {
+                // Créez un objet URL pour l'aperçu de l'image
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    // Mettez à jour la source de l'image avec l'URL de l'aperçu
+                    filePreview.src = e.target.result;
+                };
+                // Chargez le fichier en tant que données URL
+                reader.readAsDataURL(fileUpload.files[0]);
+            }
+        });
+    </script>
+
+    <script>
+        // JS pour nombre de vitesse 
+        document.addEventListener("DOMContentLoaded", function () {
+            var vitesseRange = document.getElementById("nombre_de_vitesse");
+            var vitesseValue = document.getElementById("vitesse_value");
+
+            vitesseRange.addEventListener("input", function () {
+                vitesseValue.textContent = vitesseRange.value;
+            });
+        });
+    </script>
+
+    <script>
+        // JS pour changer la liste des modèles en fonction de la marque sélectionnée
+        function changeModeleList() {
+            const marqueSelect = document.getElementById("marque_voiture_select");
+            const modeleSelect = document.getElementById("modele_select");
+
+            const selectedMarque = marqueSelect.value;
+
+            // Logique pour filtrer les modèles en fonction de la marque sélectionnée
+            for (let i = 0; i < modeleSelect.options.length; i++) {
+                const option = modeleSelect.options[i];
+                if (option.value === selectedMarque || option.value === "autre") {
+                    option.style.display = "block";
+                } else {
+                    option.style.display = "none";
+                }
+            }
+        }
+    </script>
+
+    {% endblock content %}

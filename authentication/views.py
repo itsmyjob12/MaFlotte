@@ -28,6 +28,8 @@ from .forms import FirstLoginPasswordChangeForm
 from django.http import JsonResponse
 from .forms import *  
 from django.core.paginator import Paginator
+from django.contrib.auth import update_session_auth_hash
+
 
 
 
@@ -124,33 +126,54 @@ def register(request):
 
     return render(request, 'accounts/register.html')
 
+
+
+
+
+
 def login_view(request):
     if request.method == "POST":
-        identifier = request.POST.get('identifier')
-        password = request.POST.get('password')
+        identifier = request.POST['identifier']
+        password = request.POST['password']
         
-        # Rechercher l'utilisateur par email ou nom d'utilisateur
+        # Rechercher l'utilisateur par email ou par nom d'utilisateur
         user = User.objects.filter(Q(email=identifier) | Q(username=identifier)).first()
 
         if user is not None:
             authenticated_user = authenticate(request=request, username=user.username, password=password)
             if authenticated_user is not None:
                 login(request, authenticated_user)
-               
-                if user.groups.filter(name='conducteur').exists():
-                    if hasattr(user, 'ConducteurProfile') and user.ConducteurProfile.is_new_Conducteur:
+                try:
+                    profile = user.profile
+                    profile.is_online = True
+                    profile.save()
+                except Profile.DoesNotExist:
+                    messages.error(request, 'Profil non trouvé.')
+                # Vérifier si l'utilisateur a un ConducteurProfile
+                try:
+                    conducteur_profile = user.conducteurprofile
+                    if conducteur_profile.is_new_conducteur:
                         return redirect('first_login_password_change')
                     else:
-                        messages.success(request, 'Connexion réussie en tant que Conducteur')
-                        return redirect('profile')  # Rediriger vers la page homeconducteur si l'utilisateur est un conducteur
-                elif user.groups.filter(name='Admin').exists():                
-                    if user.adminprofile.is_new_admin:
-                        return redirect('first_login_password_change')
-                    else:
-                        messages.success(request, 'Connexion réussie')
-                        return redirect('home') 
-                else:
-                    return redirect('home')
+                        messages.success(request, 'Connexion réussie en tant que conducteur')
+                        return redirect('profile')
+                except ConducteurProfile.DoesNotExist:
+                    # Vérifier si l'utilisateur a un AdminProfile
+                    try:
+                        admin_profile = user.adminprofile
+                        if admin_profile.is_new_admin:
+                            return redirect('first_login_password_change')
+                        else:
+                            messages.success(request, 'Connexion réussie')
+                            return redirect('home')
+                    except AdminProfile.DoesNotExist:
+                        # Vérifier si l'utilisateur est un superutilisateur
+                        if user.is_superuser:
+                            messages.success(request, 'Connexion réussie en tant que superutilisateur')
+                            return redirect('home')  # Redirige vers la page d'accueil pour les superutilisateurs
+                        else:
+                            messages.error(request, 'Profil non trouvé pour cet utilisateur')
+                            return redirect('login')
             else:
                 messages.error(request, 'Mauvaise authentification')
         else:
@@ -158,14 +181,18 @@ def login_view(request):
 
     return render(request, 'accounts/login.html')
 
-
 def logout_view(request):
-    logout(request)
     if request.user.is_authenticated:
-        logout(request)
-    messages.success(request, 'logout successfully!')
+        try:
+            profile = request.user.profile
+            profile.is_online = False
+            profile.save()
+        except Profile.DoesNotExist:
+            messages.error(request, 'Profil non trouvé.')
+
+    logout(request)
+    messages.success(request, 'Déconnexion réussie!')
     return redirect('login')
- 
 
 def password_reset_request(request):
 	if request.method == "POST":
@@ -204,7 +231,6 @@ def first_login_password_change(request):
     user = request.user  # Assurez-vous que request.user est bien un objet User
     if request.method == 'POST':
         form = FirstLoginPasswordChangeForm(request.POST)
-
         if form.is_valid():
             new_password = form.cleaned_data['new_password']
             confirm_password = form.cleaned_data['confirm_password']
@@ -212,19 +238,22 @@ def first_login_password_change(request):
             if new_password == confirm_password:
                 user.set_password(new_password)
                 user.save()
-
-                if hasattr(user, 'conducteurprofile') and user.conducteurprofile.is_new_Conducteur:
-                    user.conducteurprofile.is_new_Conducteur = False
+                update_session_auth_hash(request, user)  # Garder la session active après le changement de mot de passe
+                
+                # Mettre à jour le profil en fonction du type de profil
+                if hasattr(user, 'conducteurprofile'):
+                    user.conducteurprofile.is_new_conducteur = False
                     user.conducteurprofile.save()
                     return redirect('profile')
-                elif hasattr(user, 'adminprofile') and user.adminprofile.is_new_admin:
+                elif hasattr(user, 'adminprofile'):
                     user.adminprofile.is_new_admin = False
                     user.adminprofile.save()
                     return redirect('home')
+                return redirect('login')
             else:
-                messages.error(request, "Passwords do not match.")
+                messages.error(request, "Les mots de passe ne correspondent pas.")
         else:
-            messages.error(request, "Please correct errors in the form.")
+            messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
     else:
         form = FirstLoginPasswordChangeForm()
 

@@ -4,7 +4,7 @@
 <!-- Bootstrap Bundle JS (inclut Popper) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 
-
+{% if user.is_superuser or user.adminprofile %}
 <nav class="sidenav navbar navbar-vertical  fixed-left  navbar-expand-xs navbar-light bg-white" id="sidenav-main">
   <div class="scrollbar-inner">
     <!-- Brand -->
@@ -19,46 +19,45 @@
         <!-- Nav items -->
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link {% if 'index' in segment %} active {% endif %}" href="/">
+            <a class="nav-link {% if 'index' in segment %} active {% endif %}" href="{% url 'index' %}">
               <i class="ni ni-tv-2 text-primary"></i>
               <span class="nav-link-text">Dashboard</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if 'map' in segment %} active {% endif %}" href="/map.html">
+            <a class="nav-link {% if 'map' in segment %} active {% endif %}" href="{% url 'map' %}">
               <i class="ni ni-pin-3 text-primary"></i>
               <span class="nav-link-text">Google</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if 'profile' in segment %} active {% endif %}" href="/profile.html">
+            <a class="nav-link {% if 'profile' in segment %} active {% endif %}" href="{% url 'profile' %}">
               <i class="ni ni-single-02 text-yellow"></i>
               <span class="nav-link-text">Profile</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if 'Ajout-vehicule' in segment %} active {% endif %}"
+            <a class="nav-link {% if 'ajout_vehicule' in segment %} active {% endif %}"
               href="{% url 'ajout_vehicule' %}">
               <i class="fa fa-truck"></i>
               <span class="nav-link-text">Ajout de véhicules</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if 'liste-vehicule' in segment %} active {% endif %}"
-              href="{% url 'liste_voiture' %}">
+            <a class="nav-link {% if 'liste_voiture' in segment %} active {% endif %}" href="{% url 'liste_voiture' %}">
               <i class="fa fa-truck"></i>
               <span class="nav-link-text">Liste des véhicules</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if 'Ajout-conducteur' in segment %} active {% endif %}"
+            <a class="nav-link {% if 'ajout_conducteur' in segment %} active {% endif %}"
               href="{% url 'ajout_conducteur' %}">
               <i class="fa fa-address-card"></i>
               <span class="nav-link-text">Ajout de conducteurs</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if 'liste-conducteur' in segment %} active {% endif %}"
+            <a class="nav-link {% if 'list_conducteur' in segment %} active {% endif %}"
               href="{% url 'list_conducteur' %}">
               <i class="fa fa-address-card">
               </i><span class="nav-link-text">Listes des
@@ -67,9 +66,16 @@
           </li>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if 'icons' in segment %} active {% endif %}" href="/maintenance.html">
+            <a class="nav-link {% if 'icons' in segment %} active {% endif %}" href="{% url 'maintenance' %}">
               <i class="fa fa-wrench" aria-hidden="true"></i>
               <span class="nav-link-text">Maintenance</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'liste_maintenances' in segment %} active {% endif %}"
+              href="{% url 'liste_maintenances' %}">
+              <i class="fa fa-wrench" aria-hidden="true"></i>
+              <span class="nav-link-text">liste des maintenances</span>
             </a>
           </li>
           <li class="nav-item">
@@ -106,3 +112,4 @@
     </div>
   </div>
 </nav>
+{% endif %}

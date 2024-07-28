@@ -11,6 +11,7 @@ class Conducteur(models.Model):
     telephone = models.CharField(max_length=100)
     site_web = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
+    genre = models.CharField(max_length=10, choices=[('homme', 'Homme'), ('femme', 'Femme')])
     photo_conducteur = models.ImageField(upload_to='photo_conducteur/')
     status = models.BooleanField(default= True)
     date_add = models.DateTimeField(auto_now= True)
@@ -78,3 +79,18 @@ class Voiture(models.Model):
 
     def __str__(self):
         return f"{self.modele.marque} {self.modele} - {self.annee_fabrication}"
+    
+class Reparation(models.Model):
+    voiture = models.ForeignKey(Voiture, on_delete=models.CASCADE)
+    description = models.TextField()
+    date_reparation = models.DateField()
+    cout = models.DecimalField(max_digits=10, decimal_places=2)
+    photo_reparation = models.ImageField(upload_to='reparations/', blank=True, null=True)
+    
+    # standards
+    date_add = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField(auto_now=True)
+    status = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return f"Réparation pour {self.voiture} - {self.date_reparation}"    

@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-
+{% load static %}
 {% block title %} Dashboard {% endblock title %}
 
 <!-- Specific CSS goes HERE -->
@@ -270,7 +270,7 @@
 </div>
 
 
-<!-- <script>
+<script>
   // Fonction pour générer des données aléatoires de voitures
   function generateRandomCars() {
     var cars = [
@@ -327,7 +327,7 @@
   updateRealTimeCarsTable();
   // Mettre à jour toutes les 5 secondes (à titre d'exemple)
   setInterval(updateRealTimeCarsTable, 5000);
-</script> -->
+</script>
 
 
 <script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
@@ -533,9 +533,7 @@
                         {% if profile.role == 1 %}
                         Administrateur
                         {% elif profile.role == 2 %}
-                        Manager
-                        {% elif profile.role == 3 %}
-                        Agent
+                        Conducteur
                         {% endif %}
                       </small>
                     </div>

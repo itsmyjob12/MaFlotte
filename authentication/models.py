@@ -82,12 +82,12 @@ class Profile (models.Model):
           return self.user.username
 
 
-@receiver(post_save, sender=User)
-def create_or_update_Conducteur_profile(sender, instance, created, **kwargs):
-    if created and instance.groups.filter(name='Conducteur').exists():
-        ConducteurProfile.objects.create(user=instance)
-    elif instance.groups.filter(name='Conducteur').exists():
-        instance.Conducteurprofile.save() 
+# @receiver(post_save, sender=User)
+# def create_or_update_Conducteur_profile(sender, instance, created, **kwargs):
+#     if created and instance.groups.filter(name='Conducteur').exists():
+#         ConducteurProfile.objects.create(user=instance)
+#     elif instance.groups.filter(name='Conducteur').exists():
+#         instance.Conducteurprofile.save() 
    
 
 # Create your models here
