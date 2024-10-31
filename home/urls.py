@@ -5,7 +5,7 @@ from .views import *
 urlpatterns = [
 
     # The home page
-    path('home/', views.index, name='home'),
+    path('home/', views.index, name='home'),    
     # Matches any html file
     # re_path(r'^.*\.*', views.pages, name='pages'),
     path('home/ajout/vehicule/', new_voiture, name='ajout_vehicule'),
@@ -29,6 +29,12 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('map/', views.map_view, name='map'),
     path('profile/', views.profile, name='profile'),
-    
+    path('carburant/', views.carburant, name='carburant'),
+    path('entretien/', views.entretien, name='entretien'),
+    path('ajouter_entretien/', views.ajouter_entretien, name='ajouter_entretien'),
+    path('carburant/', views.gestion_carburant, name='gestion_carburant'),
+    path('carburant/add/', views.add_carburant, name='add_carburant'),
+    path('carburant/modify/<int:pk>/', views.modify_carburant, name='modify_carburant'),
+    path('carburant/delete/<int:pk>/', views.delete_carburant, name='delete_carburant'),
 
 ]

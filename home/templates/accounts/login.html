@@ -1,63 +1,96 @@
 {% extends 'layouts/base-fullscreen.html' %}
 
-{% block title %} Login {% endblock title %}
+{% load static %}
 
-<!-- Specific CSS goes HERE -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block title %} Connexion {% endblock title %}
+
+<!-- CSS spécifique ici -->
+{% block stylesheets %}
+<style>
+  /* Image de fond pour la page de connexion */
+  .login-background {
+    background: url("{% static 'assets/img/background.jpg' %}") no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .login-card {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .logo-img img {
+    width: 150px;
+    margin-bottom: 20px;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+  }
+</style>
+{% endblock stylesheets %}
 
 {% block content %}
 {% load static %}
-<!-- Page content -->
+<!-- Contenu de la page -->
 
-<div class="container mt--8 pb-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-5 col-md-7">
-      <div class="card bg-secondary shadow border-0">
-        <div class="card-header bg-transparent pb-5">
-          <div class="text-muted text-center mt-2 mb-3">
-            Se Connecter
+<div class="login-background">
+  <div class="container mt--8 pb-5">
+    <div class="row justify-content-center" style="margin-bottom: 450px;">
+      <div class="col-lg-5 col-md-7">
+        <div class="card login-card bg-secondary shadow border-0">
+          <div class="card-header bg-transparent pb-5">
+            <div class="text-muted text-center mt-2 mb-3">
+              <h4>Se Connecter à votre
+                application Gestion de Flotte</h4>
+            </div>
           </div>
-        </div>
-        <div class="card-body px-lg-5 py-lg-5">
-          <div class="text-center text-muted mb-4">
-            <a href="{% url 'home' %}" class="text-nowrap logo-img text-center d-block py-3 w-100">
-              <img src="/static/assets/img/brand/logo.png" width="180" alt="">
-            </a>
-          </div>
-          {% if messages %}
-          <div class="messages">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-            {% endfor %}
-          </div>
-          {% endif %}
-          <form method="POST" action="{% url 'login' %}">
-            {% csrf_token %}
-            <div class="form-group mb-3">
-              <div class="input-group input-group-alternative">
-                <div class="input-group-prepend">
-                  <span class="input-group-text"><i class="ni ni-hat-3"></i></span>
+          <div class="card-body px-lg-5 py-lg-5">
+            <div class="text-center text-muted mb-4">
+              <a href="{% url 'home' %}" class="text-nowrap logo-img text-center d-block py-3 w-100">
+                <img src="{% static 'assets/img/brand/logo.png' %}" alt="Logo">
+              </a>
+            </div>
+            {% if messages %}
+            <div class="messages">
+              {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+            {% endif %}
+            <form method="POST" action="{% url 'login' %}">
+              {% csrf_token %}
+              <div class="form-group mb-3">
+                <div class="input-group input-group-alternative">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="ni ni-hat-3"></i></span>
+                  </div>
+                  <input type="text" name="identifier" class="form-control" placeholder="Nom d'utilisateur ou Email"
+                    required>
                 </div>
-                <input type="text" name="identifier" class="form-control" placeholder="Username or Email" required>
               </div>
-            </div>
-            <div class="form-group">
-              <div class="input-group input-group-alternative">
-                <div class="input-group-prepend">
-                  <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+              <div class="form-group">
+                <div class="input-group input-group-alternative">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                  </div>
+                  <input type="password" name="password" class="form-control" placeholder="Mot de passe" required>
                 </div>
-                <input type="password" name="password" class="form-control" placeholder="Password" required>
               </div>
-            </div>
-            <div class="form-group">
-              <button type="submit" class="btn btn-primary btn-block">Login</button>
-            </div>
-          </form>
-        </div>
-      </div>
-      <div class="row mt-3">
-        <div class="col-6 text-right">
-          <a href="https://appseed.us/support" class="text-light"><small>Get Support</small></a>
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block">Connexion</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -66,5 +99,20 @@
 
 {% endblock content %}
 
-<!-- Specific JS goes HERE -->
-{% block javascripts %}{% endblock javascripts %}
+<!-- JS spécifique ici -->
+{% block javascripts %}
+<script>
+  // Ajouter du JavaScript spécifique ici
+  document.addEventListener('DOMContentLoaded', function () {
+    // Exemple : Afficher une alerte s'il y a des messages
+    const messages = document.querySelectorAll('.alert');
+    if (messages.length > 0) {
+      setTimeout(() => {
+        messages.forEach(message => {
+          message.style.opacity = 0;
+        });
+      }, 3000); // Disparition après 3 secondes
+    }
+  });
+</script>
+{% endblock javascripts %}

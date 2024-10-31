@@ -1,14 +1,15 @@
 <nav class="navbar navbar-top navbar-expand navbar-dark bg-custom border-bottom">
   <div class="container-fluid">
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <!-- Search form -->
+      <!-- Formulaire de recherche -->
       <form class="navbar-search navbar-search-light form-inline mr-sm-3" id="navbar-search-main">
         <div class="form-group mb-0">
           <div class="input-group input-group-alternative input-group-merge">
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fas fa-search"></i></span>
             </div>
-            <input class="form-control" placeholder="Rechercher" type="text">
+            <input class="form-control" id="search-input" placeholder="Rechercher" type="text"
+              onkeyup="searchFunction()">
           </div>
         </div>
         <button type="button" class="close" data-action="search-close" data-target="#navbar-search-main"
@@ -16,14 +17,38 @@
           <span aria-hidden="true">×</span>
         </button>
       </form>
-      <!-- Navbar links -->
+
+      <div id="search-results"></div>
+
+      <script>
+        function searchFunction() {
+          const query = document.getElementById('search-input').value;
+          if (query.length > 2) {  // Commence la recherche après avoir tapé au moins 3 caractères
+            fetch(`/search/?q=${query}`)
+              .then(response => response.json())
+              .then(data => {
+                let resultsDiv = document.getElementById('search-results');
+                resultsDiv.innerHTML = '';  // Clear previous results
+                data.results.forEach(result => {
+                  let resultItem = document.createElement('div');
+                  resultItem.innerHTML = result.name;  // Adjust to display the desired result fields
+                  resultsDiv.appendChild(resultItem);
+                });
+              });
+          } else {
+            document.getElementById('search-results').innerHTML = '';  // Clear results if query is too short
+          }
+        }
+      </script>
+
+      <!-- Liens de la navbar -->
       <ul class="navbar-nav align-items-center ml-auto ml-md-0">
         <li class="nav-item dropdown">
           <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
             aria-expanded="false">
-            <div class="media align-items-center">
+            <div class="media align-items-center" style="padding-left: 850px;">
               <span class="avatar avatar-sm rounded-circle">
-                <img alt="Image placeholder" src="/static/assets/img/theme/5-3.webp">
+                <img alt="Image utilisateur" src="/static/assets/img/theme/5-3.webp">
               </span>
               <div class="media-body ml-2 d-none d-lg-block">
                 <span class="mb-0 text-sm font-weight-bold">{{ request.user.username }}</span>
@@ -34,13 +59,9 @@
             <div class="dropdown-header noti-title">
               <h6 class="text-overflow m-0">Bienvenue!</h6>
             </div>
-            <a href="/profile.html" class="dropdown-item">
+            <a href="{% url 'profile' %}" class="dropdown-item">
               <i class="ni ni-single-02"></i>
               <span>Mon profil</span>
-            </a>
-            <a target="_blank" href="http://appseed.us/support" class="dropdown-item">
-              <i class="ni ni-support-16"></i>
-              <span>Support</span>
             </a>
             <div class="dropdown-divider"></div>
             <a href="{% url 'logout' %}" class="dropdown-item">
@@ -54,74 +75,44 @@
   </div>
 </nav>
 
+
+
 <style>
-  .navbar-search {
-    margin-right: 20px;
-    /* Exemple de marge à droite pour séparer visuellement les éléments */
-  }
-
-  .navbar-search .input-group {
-    padding: 8px;
-    /* Espacement interne pour la barre de recherche */
-  }
-
+  /* Personnalisation de la navbar */
   .bg-custom {
     background-color: #4a90e2;
-    /* Couleur bleue personnalisée */
+    /* Couleur de fond personnalisée */
   }
 
-  .navbar-search .input-group-prepend .input-group-text {
-    background-color: #357ABD;
-    /* Couleur légèrement plus foncée pour le contraste */
-    color: #fff;
+  /* Style du bouton de recherche */
+  .navbar-search-light .form-control {
+    border-radius: 0.375rem;
+    /* Bordure arrondie */
+    padding: 0.375rem 0.75rem;
+    /* Espacement intérieur */
   }
 
-  .navbar-search .form-control {
-    border-color: #357ABD;
-  }
-
-  .navbar-search .form-control:focus {
-    box-shadow: none;
-    border-color: #357ABD;
-  }
-
-  .navbar-nav .nav-link {
-    color: #fff;
-  }
-
-  .navbar-nav .nav-link:hover {
-    color: #d1ecf1;
-    /* Couleur de survol */
-  }
-
-  .dropdown-menu {
-    background-color: #f8f9fa;
-    /* Couleur de fond du menu déroulant */
-  }
-
-  .dropdown-item {
-    color: #212529;
-    /* Couleur du texte des éléments du menu */
-  }
-
-  .dropdown-item:hover {
-    background-color: #e9ecef;
-    /* Couleur de survol des éléments du menu */
-    color: #212529;
-  }
-
-  .navbar .avatar {
+  /* Style de l'avatar */
+  .avatar {
     border: 2px solid #fff;
     /* Bordure blanche autour de l'avatar */
   }
 
-  .navbar .media-body .text-sm {
-    color: #fff;
-    /* Couleur blanche pour le nom d'utilisateur */
+  /* Style des éléments du dropdown */
+  .dropdown-menu {
+    border-radius: 0.375rem;
+    /* Bordure arrondie */
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.175);
+    /* Ombre discrète */
   }
 
-  .ni-user-run {
-    color: #dc3545;
-    /* Couleur rouge pour l'icône de déconnexion */
+  .dropdown-item {
+    font-size: 0.875rem;
+    /* Taille de police plus petite */
+  }
+
+  .dropdown-item:hover {
+    background-color: #f8f9fa;
+    /* Couleur de fond au survol */
   }
 </style>

@@ -1,9 +1,6 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
 {% block content %}
-
-<!-- partial -->
-
 <style>
     /* Styles généraux pour le tableau de bord */
     .main-panel {
@@ -128,7 +125,7 @@
 <body>
 
     <div class="page-header">
-        <h3 class="page-title">Gestion de la Reparation</h3>
+        <h3 class="page-title">Gestion de l'Entretien</h3>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
             </ol>
@@ -139,9 +136,8 @@
             <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <h4 class="card-title">Ajouter une Réparation</h4>
-                        <form method="post" action="{% url 'ajouter_reparation' %}" enctype="multipart/form-data"
-                            class="needs-validation" novalidate>
+                        <h4 class="card-title">Ajouter un Entretien</h4>
+                        <form method="post" action="{% url 'ajouter_entretien' %}" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="mb-3">
                                 <label for="voiture" class="form-label">Véhicule</label>
@@ -157,23 +153,23 @@
                             <div class="mb-3">
                                 <label for="description" class="form-label">Description</label>
                                 <textarea class="form-control" name="description" id="description"
-                                    placeholder="Description de la réparation" required></textarea>
+                                    placeholder="Description de l'entretien" required></textarea>
                                 <div class="invalid-feedback">Veuillez entrer une description.</div>
                             </div>
                             <div class="mb-3">
-                                <label for="date_reparation" class="form-label">Date de Réparation</label>
-                                <input type="date" class="form-control" name="date_reparation" id="date_reparation"
+                                <label for="date_entretien" class="form-label">Date de l'Entretien</label>
+                                <input type="date" class="form-control" name="date_entretien" id="date_entretien"
                                     required>
-                                <div class="invalid-feedback">Veuillez entrer la date de réparation.</div>
+                                <div class="invalid-feedback">Veuillez entrer la date de l'entretien.</div>
                             </div>
                             <div class="mb-3">
-                                <label for="cout" class="form-label">Coût (FCFA)</label>
+                                <label for="cout" class="form-label">Coût</label>
                                 <input type="number" class="form-control" name="cout" id="cout"
-                                    placeholder="Coût de la réparation" step="0.01" required>
-                                <div class="invalid-feedback">Veuillez entrer le coût de la réparation.</div>
+                                    placeholder="Coût de l'entretien" step="0.01" required>
+                                <div class="invalid-feedback">Veuillez entrer le coût de l'entretien.</div>
                             </div>
                             <button type="submit" class="btn btn-gradient-primary">Ajouter</button>
-                            <a href="{% url 'maintenance' %}" class="btn btn-light">Annuler</a>
+                            <a href="{% url 'entretien' %}" class="btn btn-light">Annuler</a>
                         </form>
                     </div>
                 </div>
@@ -181,58 +177,69 @@
         </div>
     </div>
 
-    <!-- content-wrapper ends -->
-    <!-- partial:partials/_footer.html -->
+
+    <div class="container my-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title">Liste des Entretiens</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Véhicule</th>
+                            <th>Description</th>
+                            <th>Date d'Entretien</th>
+                            <th>Coût</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entretien in entretiens %}
+                        <tr>
+                            <td>{{ entretien.voiture }}</td>
+                            <td>{{ entretien.description }}</td>
+                            <td>{{ entretien.date_entretien }}</td>
+                            <td>{{ entretien.cout }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">Aucun entretien trouvé.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
     {% include "includes/footer.html" %}
-    <!-- partial -->
-    </div>
-    <!-- main-panel ends -->
-    </div>
-    <!-- page-body-wrapper ends -->
-    </div>
-    <!-- container-scroller -->
-    <!-- plugins:js -->
+
     <script src="{% static 'assets1/vendors/js/vendor.bundle.base.js' %}"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
 
     <script>
-        // Sélectionnez l'élément d'entrée de type fichier et l'élément image
         const fileUpload = document.getElementById("file-upload");
         const filePreview = document.getElementById("file-preview");
 
-        // Ajoutez un écouteur d'événements pour détecter les changements dans le fichier sélectionné
         fileUpload.addEventListener("change", function () {
-            // Vérifiez si un fichier a été sélectionné
             if (fileUpload.files && fileUpload.files[0]) {
-                // Créez un objet URL pour l'aperçu de l'image
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    // Mettez à jour la source de l'image avec l'URL de l'aperçu
                     filePreview.src = e.target.result;
                 };
-                // Chargez le fichier en tant que données URL
                 reader.readAsDataURL(fileUpload.files[0]);
             }
         });
     </script>
 
     <script>
-        // Récupère le JSON des associations entre les marques et les modèles
         var modelesData = JSON.parse('{{ modeles_data|escapejs }}');
 
-        // Fonction pour changer la liste des modèles en fonction de la marque sélectionnée
         function changeModeleList() {
             var marqueSelect = document.getElementById("marque_voiture_select");
             var modeleSelect = document.getElementById("modele_select");
             var selectedMarqueId = marqueSelect.value;
 
-            // Supprime les options actuelles du select des modèles
             modeleSelect.innerHTML = '<option value="">Sélectionner le modèle</option>';
 
-            // Ajoute les options correspondant à la marque sélectionnée
             if (modelesData[selectedMarqueId]) {
                 modelesData[selectedMarqueId].forEach(function (modele) {
                     var option = document.createElement("option");
@@ -243,7 +250,7 @@
             }
         }
 
-        // Ajoute l'écouteur d'événements au changement de la sélection de marque
         document.getElementById("marque_voiture_select").addEventListener("change", changeModeleList);
     </script>
-    {% endblock %}
+</body>
+{% endblock %}

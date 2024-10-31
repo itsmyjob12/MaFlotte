@@ -1,14 +1,123 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Gestion de Carburant</h2>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
+    <!-- Tableau des données de carburant -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title">Liste des Enregistrements de Carburant</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Véhicule</th>
+                        <th>Date</th>
+                        <th>Quantité (L)</th>
+                        <th>Coût (FCFA)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in carburant_entries %}
+                    <tr>
+                        <td>{{ entry.id }}</td>
+                        <td>{{ entry.vehicle }}</td>
+                        <td>{{ entry.date }}</td>
+                        <td>{{ entry.quantity }}</td>
+                        <td>{{ entry.cost }}</td>
+                        <td>
+                            <!-- Boutons Modifier et Supprimer -->
+                            <a href="{% url 'modify_carburant' entry.id %}" class="btn btn-warning btn-sm">Modifier</a>
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#deleteModal{{ entry.id }}">Supprimer</button>
+                        </td>
+                    </tr>
+                    <!-- Modal de confirmation de suppression -->
+                    <div class="modal fade" id="deleteModal{{ entry.id }}" tabindex="-1"
+                        aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel">Confirmer la Suppression</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Êtes-vous sûr de vouloir supprimer cet enregistrement de carburant ?
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="{% url 'delete_carburant' entry.id %}" class="btn btn-danger">Supprimer</a>
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Annuler</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-<body>
-    Carburant
-</body>
+    <!-- Section pour ajouter un enregistrement de carburant -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Ajouter un Enregistrement de Carburant</h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="vehicle" class="form-label">Véhicule</label>
+                <input type="text" class="form-control" id="vehicle" name="vehicle">
+            </div>
+            <div class="mb-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="date" name="date">
+            </div>
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Quantité (L)</label>
+                <input type="number" class="form-control" id="quantity" name="quantity" step="0.01">
+            </div>
+            <div class="mb-3">
+                <label for="cost" class="form-label">Coût (FCFA)</label>
+                <input type="number" class="form-control" id="cost" name="cost" step="0.01">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="addCarburant()">Ajouter</button>
+        </div>
+    </div>
+</div>
 
-</html>
+<script>
+    function addCarburant() {
+        // Récupérer les valeurs des champs
+        const vehicle = document.getElementById('vehicle').value;
+        const date = document.getElementById('date').value;
+        const quantity = document.getElementById('quantity').value;
+        const cost = document.getElementById('cost').value;
+
+        // Envoyer une requête POST pour ajouter le carburant (utiliser Fetch ou Axios selon les besoins)
+        fetch('{% url "add_carburant" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                vehicle: vehicle,
+                date: date,
+                quantity: quantity,
+                cost: cost
+            })
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Erreur lors de l\'ajout de l\'enregistrement.');
+            }
+        });
+    }
+</script>
+{% endblock %}

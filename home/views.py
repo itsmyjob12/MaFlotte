@@ -6,7 +6,7 @@ from authentication.models import User, Profile
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from .models import MarqueVoiture, Modele, Conducteur, Voiture
+from .models import MarqueVoiture, Modele, Conducteur, Voiture, Entretien, Carburant
 import json
 from django.contrib import messages
 from django.conf import settings
@@ -83,7 +83,6 @@ def new_voiture(request):
         type_carburant = request.POST.get("type_carburant")
         transmission = request.POST.get("transmission")
         codes_erreur = request.POST.get("codes_erreur")
-        numero_chassi = request.POST.get("numero_chassi")
         nombre_de_vitesse = request.POST.get("nombre_de_vitesse")
 
         try:
@@ -107,7 +106,6 @@ def new_voiture(request):
             immatriculation=immatriculation,
             couleur_voiture=couleur_voiture,
             codes_erreur=codes_erreur,
-            numero_chassi=numero_chassi,
             nombre_de_vitesse=nombre_de_vitesse,
             photo_voiture=photo_voiture,
         )
@@ -381,9 +379,14 @@ def delete_conducteur(request, conducteur_id):
 
 
 def maintenance(request):
-    # Récupérer toutes les voitures
     voitures = Voiture.objects.all()
-    return render(request, 'home/maintenance.html', {'voitures': voitures})
+    context = {
+        'voitures': voitures,
+        'segment': 'maintenance',
+    }
+    return render(request, 'home/maintenance.html', context)
+
+
 
 def index(request):
     nombre_conducteur = Conducteur.objects.count()
@@ -397,14 +400,12 @@ def index(request):
         'nombre_Voiture': nombre_Voiture,
         'nombre_profile': nombre_profile,
         'connected_profiles': connected_profiles,
-        'segment': 'index',
+        'segment': 'home',
         'marques': marques
     }
     
     return render(request, 'home/index.html', context)
     
-    return render(request, 'home/index.html', context)
-
 def map_view(request):
     context = {
         'segment': 'map',
@@ -417,9 +418,59 @@ def profile(request):
     }
     return render(request, 'home/profile.html', context)
 
+def carburant(request):
+    context = {
+        'segment': 'carburant',
+    }
+    return render(request, 'home/carburant.html', context)
+
+
+def entretien(request):
+    entretiens = Entretien.objects.all()  # Récupère tous les entretiens
+    context = {
+        'segment': 'entretien',
+        'entretiens': entretiens,
+    }
+    return render(request, 'home/entretien.html', context)
+
+def ajouter_entretien(request):
+    if request.method == 'POST':
+        voiture_id = request.POST.get('voiture')
+        description = request.POST.get('description')
+        date_entretien = request.POST.get('date_entretien')
+        cout = request.POST.get('cout')
+        photo_entretien = request.FILES.get('photo_entretien')
+
+        try:
+            voiture = Voiture.objects.get(id=voiture_id)
+        except Voiture.DoesNotExist:
+            print("Véhicule avec l'ID spécifié n'existe pas.")
+            return redirect('entretien')  # Ou une autre gestion d'erreur appropriée
+
+        Entretien.objects.create(
+            voiture=voiture,
+            description=description,
+            date_entretien=date_entretien,
+            cout=cout,
+            photo_entretien=photo_entretien
+        )
+        return redirect('entretien')
+
+    # Debug : Affiche le nombre de voitures récupérées
+    voitures = Voiture.objects.all()
+    print(f"Nombre de voitures récupérées : {voitures.count()}")
+
+    return render(request, 'home/ajouter_entretien.html', {'voitures': voitures})
+
+
 def liste_maintenances(request):
     maintenances = Reparation.objects.all()
-    return render(request, 'home/liste_maintenances.html', {'maintenances': maintenances})
+    context = {
+        'maintenances': maintenances,
+        'segment': 'liste_maintenances',
+    }
+    return render(request, 'home/liste_maintenances.html', context)
+
 
 
 @require_POST
@@ -496,3 +547,36 @@ def supprimer_reparation(request, pk):
     reparation = get_object_or_404(Reparation, pk=pk)
     reparation.delete()
     return redirect('maintenance')
+
+
+def gestion_carburant(request):
+    carburant_entries = Carburant.objects.all()
+    return render(request, 'carburant.html', {'carburant_entries': carburant_entries})
+
+def add_carburant(request):
+    if request.method == 'POST':
+        form = CarburantForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('gestion_carburant')
+    else:
+        form = CarburantForm()
+    return render(request, 'carburant.html', {'form': form})
+
+def modify_carburant(request, pk):
+    entry = Carburant.objects.get(pk=pk)
+    if request.method == 'POST':
+        form = CarburantForm(request.POST, instance=entry)
+        if form.is_valid():
+            form.save()
+            return redirect('gestion_carburant')
+    else:
+        form = CarburantForm(instance=entry)
+    return render(request, 'carburant.html', {'form': form, 'entry': entry})
+
+def delete_carburant(request, pk):
+    entry = Carburant.objects.get(pk=pk)
+    if request.method == 'POST':
+        entry.delete()
+        return redirect('gestion_carburant')
+    return redirect('gestion_carburant')

@@ -130,134 +130,127 @@
 
 <body>
 
-  <div class="page-header">
-    <h3 class="page-title"> Fleet_Manager</h3>
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-      </ol>
-    </nav>
-  </div>
-  <div class="container my-5">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h4 class="card-title">Ajout de véhicule</h4>
-            <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-              {% csrf_token %}
-              <div class="mb-3">
-                <label for="marque_voiture" class="form-label">Marque</label>
-                <select class="form-select" name="marque_voiture" id="marque_voiture_select"
-                  onchange="changeModeleList()" required>
-                  <option value="" disabled selected>Sélectionner une marque</option>
-                  {% for marque in marques %}
-                  <option value="{{ marque.id }}">{{ marque.marque }}</option>
-                  {% endfor %}
-                </select>
-                <div class="invalid-feedback">Veuillez sélectionner une marque.</div>
-              </div>
-              <div class="mb-3">
-                <label for="modele" class="form-label">Modèle</label>
-                <select class="form-select" name="modele" id="modele_select" required>
-                  <option value="" disabled selected>Sélectionner le modèle</option>
-                  {% for modele in modeles %}
-                  <option value="{{ modele.id }}">{{ modele.nom }}</option>
-                  {% endfor %}
-                  <option value="autre">Autre</option>
-                </select>
-                <div class="invalid-feedback">Veuillez sélectionner un modèle.</div>
-              </div>
-              <div class="mb-3">
-                <label for="couleur_voiture" class="form-label">Couleur</label>
-                <input type="text" class="form-control" name="couleur_voiture" id="couleur_voiture"
-                  placeholder="Couleur de la voiture" required>
-                <div class="invalid-feedback">Veuillez entrer la couleur de la voiture.</div>
-              </div>
-              <div class="mb-3">
-                <label for="annee_fabrication" class="form-label">Année de fabrication</label>
-                <input type="date" class="form-control" name="annee_fabrication" id="annee_fabrication"
-                  placeholder="Année de fabrication" required>
-                <div class="invalid-feedback">Veuillez entrer l'année de fabrication.</div>
-              </div>
-              <div class="mb-3">
-                <label for="kilometrage" class="form-label">Kilométrage</label>
-                <input type="number" class="form-control" name="kilometrage" id="kilometrage" placeholder="Kilométrage"
-                  required>
-                <div class="invalid-feedback">Veuillez entrer le kilométrage.</div>
-              </div>
-              <div class="mb-3">
-                <label for="type_carburant" class="form-label">Type de carburant</label>
-                <select class="form-select" name="type_carburant" id="type_carburant" required>
-                  <option value="" disabled selected>Sélectionner le type de carburant</option>
-                  <option value="Gasoil">Gasoil</option>
-                  <option value="Super">Super</option>
-                  <option value="Essence">Essence</option>
-                </select>
-                <div class="invalid-feedback">Veuillez sélectionner le type de carburant.</div>
-              </div>
-              <div class="mb-3">
-                <label for="transmission" class="form-label">Transmission</label>
-                <select class="form-select" name="transmission" id="transmission" required>
-                  <option value="" disabled selected>Sélectionner la transmission</option>
-                  <option value="Manuelle">Manuelle</option>
-                  <option value="Automatique">Automatique</option>
-                </select>
-                <div class="invalid-feedback">Veuillez sélectionner la transmission.</div>
-              </div>
-              <div class="mb-3">
-                <label for="numero_serie" class="form-label">Numéro de série</label>
-                <input type="text" class="form-control" name="numero_serie" id="numero_serie"
-                  placeholder="Numéro de série" required>
-                <div class="invalid-feedback">Veuillez entrer le numéro de série.</div>
-              </div>
-              <div class="mb-3">
-                <label for="numero_chassi" class="form-label">Numéro de châssis</label>
-                <input type="text" class="form-control" name="numero_chassi" id="numero_chassi"
-                  placeholder="Numéro de châssis" required>
-                <div class="invalid-feedback">Veuillez entrer le numéro de châssis.</div>
-              </div>
-              <div class="mb-3">
-                <label for="immatriculation" class="form-label">Numéro Matricule</label>
-                <input type="text" class="form-control" name="immatriculation" id="immatriculation"
-                  placeholder="Immatriculation" required>
-                <div class="invalid-feedback">Veuillez entrer le numéro matricule.</div>
-              </div>
-              <div class="mb-3">
-                <label for="nombre_de_vitesse" class="form-label">Nombre de vitesses</label>
-                <input type="range" class="form-range" name="nombre_de_vitesse" id="nombre_de_vitesse" min="1" max="10"
-                  value="5" required>
-                <output for="nombre_de_vitesse" id="vitesse_value">5</output>
-                <div class="invalid-feedback">Veuillez sélectionner le nombre de vitesses.</div>
-              </div>
-              <div class="mb-3">
-                <label for="photo_voiture" class="form-label">Photo de la voiture</label>
-                <input type="file" class="form-control" name="photo_voiture" accept=".jpg, .jpeg, .png" id="file-upload"
-                  placeholder="Photo de la voiture" required>
-                <div class="invalid-feedback">Veuillez télécharger une photo de la voiture.</div>
-              </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
-              <a href="#" class="btn btn-secondary">Cancel</a>
-            </form>
+  <div class="main-panel">
+    <div class="content-wrapper">
+      <div class="page-header">
+        <h3 class="page-title">Gestion de véhicule</h3>
+      </div>
+    </div>
+    <div class="container my-5">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h4 class="card-title">Ajout de véhicule</h4>
+              <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="mb-3">
+                  <label for="marque_voiture" class="form-label">Marque</label>
+                  <select class="form-select" name="marque_voiture" id="marque_voiture_select"
+                    onchange="changeModeleList()" required>
+                    <option value="" disabled selected>Sélectionner une marque</option>
+                    {% for marque in marques %}
+                    <option value="{{ marque.id }}">{{ marque.marque }}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="invalid-feedback">Veuillez sélectionner une marque.</div>
+                </div>
+                <div class="mb-3">
+                  <label for="modele" class="form-label">Modèle</label>
+                  <select class="form-select" name="modele" id="modele_select" required>
+                    <option value="" disabled selected>Sélectionner le modèle</option>
+                    {% for modele in modeles %}
+                    <option value="{{ modele.id }}">{{ modele.nom }}</option>
+                    {% endfor %}
+                    <option value="autre">Autre</option>
+                  </select>
+                  <div class="invalid-feedback">Veuillez sélectionner un modèle.</div>
+                </div>
+                <div class="mb-3">
+                  <label for="couleur_voiture" class="form-label">Couleur</label>
+                  <input type="text" class="form-control" name="couleur_voiture" id="couleur_voiture"
+                    placeholder="Couleur de la voiture" required>
+                  <div class="invalid-feedback">Veuillez entrer la couleur de la voiture.</div>
+                </div>
+                <div class="mb-3">
+                  <label for="annee_fabrication" class="form-label">Année de fabrication</label>
+                  <input type="date" class="form-control" name="annee_fabrication" id="annee_fabrication"
+                    placeholder="Année de fabrication" required>
+                  <div class="invalid-feedback">Veuillez entrer l'année de fabrication.</div>
+                </div>
+                <div class="mb-3">
+                  <label for="kilometrage" class="form-label">Kilométrage</label>
+                  <input type="number" class="form-control" name="kilometrage" id="kilometrage"
+                    placeholder="Kilométrage" required>
+                  <div class="invalid-feedback">Veuillez entrer le kilométrage.</div>
+                </div>
+                <div class="mb-3">
+                  <label for="type_carburant" class="form-label">Type de carburant</label>
+                  <select class="form-select" name="type_carburant" id="type_carburant" required>
+                    <option value="" disabled selected>Sélectionner le type de carburant</option>
+                    <option value="Gasoil">Gasoil</option>
+                    <option value="Super">Super</option>
+                    <option value="Essence">Essence</option>
+                  </select>
+                  <div class="invalid-feedback">Veuillez sélectionner le type de carburant.</div>
+                </div>
+                <div class="mb-3">
+                  <label for="transmission" class="form-label">Transmission</label>
+                  <select class="form-select" name="transmission" id="transmission" required>
+                    <option value="" disabled selected>Sélectionner la transmission</option>
+                    <option value="Manuelle">Manuelle</option>
+                    <option value="Automatique">Automatique</option>
+                  </select>
+                  <div class="invalid-feedback">Veuillez sélectionner la transmission.</div>
+                </div>
+                <div class="mb-3">
+                  <label for="numero_serie" class="form-label">Numéro de série</label>
+                  <input type="text" class="form-control" name="numero_serie" id="numero_serie"
+                    placeholder="Numéro de série" required>
+                  <div class="invalid-feedback">Veuillez entrer le numéro de série.</div>
+                </div>
+                <div class="mb-3">
+                  <label for="immatriculation" class="form-label">Numéro Matricule</label>
+                  <input type="text" class="form-control" name="immatriculation" id="immatriculation"
+                    placeholder="Immatriculation" required>
+                  <div class="invalid-feedback">Veuillez entrer le numéro matricule.</div>
+                </div>
+                <div class="mb-3">
+                  <label for="nombre_de_vitesse" class="form-label">Nombre de vitesses</label>
+                  <input type="range" class="form-range" name="nombre_de_vitesse" id="nombre_de_vitesse" min="1"
+                    max="10" value="5" required>
+                  <output for="nombre_de_vitesse" id="vitesse_value">5</output>
+                  <div class="invalid-feedback">Veuillez sélectionner le nombre de vitesses.</div>
+                </div>
+                <div class="mb-3">
+                  <label for="photo_voiture" class="form-label">Photo de la voiture</label>
+                  <input type="file" class="form-control" name="photo_voiture" accept=".jpg, .jpeg, .png"
+                    id="file-upload" placeholder="Photo de la voiture" required>
+                  <div class="invalid-feedback">Veuillez télécharger une photo de la voiture.</div>
+                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <a href="#" class="btn btn-secondary">Annuler</a>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card shadow-sm">
-          <div class="card-body text-center">
-            <h4 class="card-title">Aperçu de l'image sélectionnée</h4>
-            <img src="#" alt="Visionnage de l'image sélectionnée" id="file-preview" class="img-fluid" />
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-body text-center">
+              <h4 class="card-title">Aperçu de l'image sélectionnée</h4>
+              <img src="#" alt="Visionnage de l'image sélectionnée" id="file-preview" class="img-fluid" />
 
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  
-  <!-- content-wrapper ends -->
-  <!-- partial:partials/_footer.html -->
-  {% include "includes/footer.html" %}
-  <!-- partial -->
+
+    <!-- content-wrapper ends -->
+    <!-- partial:partials/_footer.html -->
+    {% include "includes/footer.html" %}
+    <!-- partial -->
   </div>
   <!-- main-panel ends -->
   </div>

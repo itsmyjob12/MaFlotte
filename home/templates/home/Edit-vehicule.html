@@ -151,7 +151,8 @@
                                     onchange="changeModeleList()" required>
                                     <option value="" disabled>Sélectionner une marque</option>
                                     {% for marque in marques %}
-                                    <option value="{{ marque.id }}" {% if voiture.modele.marque.id == marque.id %}selected{% endif %}>
+                                    <option value="{{ marque.id }}" {% if voiture.modele.marque.id==marque.id
+                                        %}selected{% endif %}>
                                         {{ marque.marque }}
                                     </option>
                                     {% endfor %}
@@ -163,7 +164,8 @@
                                 <select class="form-select" name="modele" id="modele_select" required>
                                     <option value="" disabled>Sélectionner le modèle</option>
                                     {% for modele in modeles %}
-                                    <option value="{{ modele.id }}" {% if voiture.modele.id == modele.id %}selected{%endif%}>
+                                    <option value="{{ modele.id }}" {% if voiture.modele.id==modele.id
+                                        %}selected{%endif%}>
                                         {{ modele.nom }}
                                     </option>
                                     {% endfor %}
@@ -192,7 +194,8 @@
                             </div>
                             <div class="mb-3">
                                 <label for="type_carburant" class="form-label">Type de carburant</label>
-                                <select class="form-select" name="type_carburant" id="type_carburant" value="{{ voiture.type_carburant }}" required>
+                                <select class="form-select" name="type_carburant" id="type_carburant"
+                                    value="{{ voiture.type_carburant }}" required>
                                     <option value="" disabled selected>Sélectionner le type de carburant</option>
                                     <option value="Gasoil">Gasoil</option>
                                     <option value="Super">Super</option>
@@ -202,7 +205,8 @@
                             </div>
                             <div class="mb-3">
                                 <label for="transmission" class="form-label">Transmission</label>
-                                <select class="form-select" name="transmission" id="transmission" value="{{ voiture.transmission }}" required>
+                                <select class="form-select" name="transmission" id="transmission"
+                                    value="{{ voiture.transmission }}" required>
                                     <option value="" disabled selected>Sélectionner la transmission</option>
                                     <option value="Manuelle">Manuelle</option>
                                     <option value="Automatique">Automatique</option>
@@ -214,12 +218,6 @@
                                 <input type="text" class="form-control" name="numero_serie" id="numero_serie"
                                     value="{{ voiture.numero_serie }}" required>
                                 <div class="invalid-feedback">Veuillez entrer le numéro de série.</div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="numero_chassi" class="form-label">Numéro de châssis</label>
-                                <input type="text" class="form-control" name="numero_chassi" id="numero_chassi"
-                                    value="{{ voiture.numero_chassi }}" required>
-                                <div class="invalid-feedback">Veuillez entrer le numéro de châssis.</div>
                             </div>
                             <div class="mb-3">
                                 <label for="immatriculation" class="form-label">Numéro Matricule</label>
@@ -238,7 +236,8 @@
                             <div class="mb-3">
                                 <label for="photo_voiture" class="form-label">Photo de la voiture</label>
                                 <input type="file" class="form-control" name="photo_voiture" accept=".jpg, .jpeg, .png"
-                                    id="file-upload" placeholder="Photo de la voiture" value="{{ voiture.photo_voiture }}" required>
+                                    id="file-upload" placeholder="Photo de la voiture"
+                                    value="{{ voiture.photo_voiture }}" required>
                                 <div class="invalid-feedback">Veuillez télécharger une photo de la voiture.</div>
                             </div>
                             <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>

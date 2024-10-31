@@ -49,7 +49,7 @@ def send_password_email(email, password):
     from_email = 'admin@example.com'
     subject = 'Your Account Password'
     site_url = "http://127.0.0.1:8000/"
-    message = f"Bienvenue ,\n\nThank you for choosing It Next. To proceed with your order, please confirm your email account by logging in.\n\nYour password is: {password}\n\nYou can log in here: {site_url}\n\nThank you,\nDonald\nProgrammeur"
+    message = f"Bienvenue ,\n\nMerci d'avoir. Pour continuer votre commande, veuillez confirmer votre compte e-mail en vous connectant.\n\nVotre mot de passe est: {password}\n\nVous pouvez vous connecter ici: {site_url}\n\nMerci,\nFleet\nManager"
 
     try:
         server = smtplib.SMTP(smtp_server, smtp_port)
@@ -70,23 +70,23 @@ def register(request):
         role = request.POST['role']
         
         if User.objects.filter(email=email):
-            messages.error(request, 'This email is already associated with an account.')
+            messages.error(request, 'Cet email est déjà associé à un compte.')
             return redirect('register')
         
         if len(username) > 30:
-            messages.error(request, 'Username must not be more than 30 characters.')
+            messages.error(request, 'Le nom d_utilisateur ne doit pas dépasser 30 caractères.')
             return redirect('register')
         
         if User.objects.filter(username=username):
-            messages.error(request, 'This username is already associated with an account.')
+            messages.error(request, 'Ce nom d_utilisateur est déjà associé à un compte.')
             return redirect('register')
         
         if len(firstname) > 30:
-            messages.error(request, 'First name must not be more than 30 characters.')
+            messages.error(request, 'Le prénom ne doit pas dépasser 30 caractères.')
             return redirect('register')
         
         if len(lastname) > 30:
-            messages.error(request, 'Last name must not be more than 30 characters.')
+            messages.error(request, 'Le nom de famille ne doit pas dépasser 30 caractères.')
             return redirect('register')
 
         # Générer un mot de passe aléatoire
@@ -120,7 +120,7 @@ def register(request):
             conducteur_profile.save()
             profile.save()
             
-        messages.success(request, 'The user account has been successfully created.')
+        messages.success(request, 'Le compte utilisateur a été créé avec succès.')
         
         return redirect('home')
 

@@ -94,3 +94,27 @@ class Reparation(models.Model):
     
     def __str__(self):
         return f"Réparation pour {self.voiture} - {self.date_reparation}"    
+    
+class Entretien(models.Model):
+    voiture = models.ForeignKey(Voiture, on_delete=models.CASCADE)
+    description = models.TextField()
+    date_entretien = models.DateField()
+    cout = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    # standards
+    date_add = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField(auto_now=True)
+    status = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return f"Entretien pour {self.voiture} - {self.date_entretien}"    
+    
+    
+class Carburant(models.Model):
+    vehicle = models.CharField(max_length=100)
+    date = models.DateField()
+    quantity = models.DecimalField(max_digits=6, decimal_places=2)
+    cost = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f'{self.vehicle} - {self.date}'    

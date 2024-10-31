@@ -3,16 +3,10 @@
 <div class="main-panel">
   <div class="content-wrapper">
     <div class="page-header">
-      <h3 class="page-title">
-        <span class="page-title-icon bg-gradient-primary text-white me-2">
-          <i class="mdi mdi-home"></i>
-        </span>
-        Dashboard
-      </h3>
       <nav aria-label="breadcrumb">
         <ul class="breadcrumb">
           <li class="breadcrumb-item active" aria-current="page">
-            <span></span>Détails vehicule
+            <span></span>Détails véhicule
             <i class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i>
           </li>
         </ul>
@@ -21,21 +15,17 @@
 
     <div class="main">
       <div class="container">
-        <img src="{{ voitures.photo_voiture.url }}" alt="Photo du véhicule"
-          class="vehicle-image" />
+        <img src="{{ voitures.photo_voiture.url }}" alt="Photo du véhicule" class="vehicle-image" />
         <div class="vehicle-details">
           <h2>Détails du véhicule</h2>
           <p><strong>Marque:</strong> {{voitures.modele.marque}}</p>
           <p><strong>Modèle:</strong> {{voitures.modele}}</p>
           <p><strong>Immatriculation:</strong> {{voitures.immatriculation}}</p>
-          <p><strong>Numéro de châssis:</strong> {{voitures.numero_chassi}}</p>
           <p><strong>Numéro de série:</strong> {{voitures.numero_serie}}</p>
           <p><strong>Couleur:</strong> {{voitures.couleur_voiture}}</p>
           <p><strong>Kilométrage:</strong> {{voitures.kilometrage}} km</p>
           <p><strong>Type de carburant:</strong> {{voitures.type_carburant}}</p>
           <p><strong>Transmission:</strong> {{voitures.transmission}}</p>
-          <p><strong>Nombre de vitesses:</strong> {{voitures.nombre_de_vitesse}}</p>
-          <p><strong>Symptômes:</strong> {{voitures.symptomes}}</p>
           <p>
             <strong>Historique de maintenance:</strong> {{voitures.historique_maintenance}}
           </p>
@@ -51,12 +41,45 @@
 
         </div>
       </div>
-      {% include "includes/footer.html" %}
+
 
     </div>
-
+    {% include "includes/footer.html" %}
 
     <style>
+      .page-title {
+        font-size: 2rem;
+        /* Taille de la police */
+        font-weight: bold;
+        /* Mettre en gras */
+        color: #343a40;
+        /* Couleur du texte */
+        margin-bottom: 1rem;
+        /* Espace en bas */
+      }
+
+      .breadcrumb {
+        background-color: #f8f9fa;
+        /* Couleur de fond */
+        border-radius: 0.25rem;
+        /* Arrondi des coins */
+        padding: 0.75rem 1rem;
+        /* Espacement intérieur */
+      }
+
+      .breadcrumb-item.active {
+        color: #6c757d;
+        /* Couleur du texte de l'élément actif */
+        font-weight: bold;
+        /* Mettre en gras */
+      }
+
+      .breadcrumb-item .mdi {
+        margin-left: 0.5rem;
+        /* Espace entre le texte et l'icône */
+      }
+
+
       .main {
         display: flex;
         flex-direction: column;
